@@ -279,7 +279,7 @@ method updateClassName Scripter {
 }
 
 method devModeCategories Scripter {
-  return (array 'Control' 'Motion' 'Looks' 'Drawing' 'Drawing - Paths' 'Color' 'Pixels' 'Sensing' 'Pen' 'Sound' 'Music' 'Operators' 'Variables' 'Words' 'Data' 'Table' 'Structure' 'Network' 'Functions' 'Serial Port' 'File Stream' 'Debugging' 'My Blocks')
+  return (array 'Control' 'Motion' 'Looks' 'Drawing' 'Paths' 'Color' 'Pixels' 'Sensing' 'Pen' 'Sound' 'Music' 'Operators' 'Variables' 'Words' 'Data' 'Dictionary' 'Table' 'Structure' 'Network' 'Functions' 'Serial Port' 'File Stream' 'Debugging' 'Developer' 'My Blocks')
 }
 
 method userModeCategories Scripter {

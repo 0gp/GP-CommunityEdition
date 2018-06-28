@@ -39,7 +39,7 @@ method initialize Stage w h {
 }
 
 method setAspectRatio Stage w h {
-  majorAxis = 800
+  majorAxis = (toInteger (global 'stageResolution'))
   if (or (isNil w) (isNil h)) {
 	w = 16
 	h = 10
@@ -208,6 +208,7 @@ method hasEditor Stage {
 }
 
 method exitPresentationMode Stage {
+  setFullScreen false
   for m (parts (morph (global 'page'))) {
 	if (isClass (handler m) 'ProjectEditor') {
 	  exitPresentation (handler m)

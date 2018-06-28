@@ -31,8 +31,9 @@ to startProjectEditorFromMorphic {
 
 to o tryRetina devMode { openProjectEditor tryRetina devMode } // shortcut, because Jens needs it so often :-)
 
-to openProjectEditor tryRetina devMode presentFlag {
+to openProjectEditor tryRetina devMode presentFlag appFlag {
   if (isNil tryRetina) { tryRetina = true }
+  if (isNil appFlag) { appFlag = false }
   if (isNil devMode) { devMode = true }
   if (isNil (global 'alanMode')) { setGlobal 'alanMode' false }
   if (isNil (global 'vectorTrails')) { setGlobal 'vectorTrails' false }
@@ -55,7 +56,12 @@ to openProjectEditor tryRetina devMode presentFlag {
   if presentFlag {
 	enterPresentation editor
   }
+  if appFlag {
+    clearProject editor
+    openProjectFromFile (last (allInstances 'Stage')) 'project.gpp'
+  }
   startSteppingSafely page presentFlag
+  broadcast 'go'
 }
 
 to findProjectEditor {
@@ -77,7 +83,7 @@ method initialize ProjectEditor aProject {
   addTopBarParts this
   scripter = (initialize (new 'Scripter') this)
   addPart morph (morph scripter)
-  stage = (newStage 16 10)
+  stage = (newStage (at (global 'stageRatio') 1) (at (global 'stageRatio') 2))
   addPart morph (morph stage)
   library = (initialize (new 'SpriteLibrary') scripter)
   addPart morph (morph library)
@@ -118,6 +124,7 @@ method addTopBarParts ProjectEditor {
   add leftItems (textButton this 'New' 'newProject')
   add leftItems (textButton this 'Open' 'openProjectMenu')
   add leftItems (textButton this 'Save' 'saveProject')
+  add leftItems (textButton this 'Settings' 'openSettings')
   if (not (isOneOf (platform) 'Browser' 'iOS')) {
 	add leftItems (textButton this 'Export as App' 'exportProjectAsApp')
 	if (canExportToWeb this) {
@@ -171,6 +178,52 @@ method newProject ProjectEditor {
   clearProject this
   createInitialClass scripter
 }
+
+//Settings by MSandro
+method openSettings ProjectEditor {
+  menu = (menu 'GP Settings' (global 'page'))
+  addItem menu 'stage ratio' 'confStageRatio'
+  addItem menu 'stage resolution' 'confStageResolution'
+  addItem menu 'keyboard hotfix' 'confKeyboardHotfix'
+  addItem menu 'Fullscreen presentation' 'confFullscreen'
+  //addItem menu 'defaults' 'confDefaults'
+  addLine menu
+  addItem menu 'Help' 'showSettingsHelp'
+  addLine menu
+  addItem menu 'Save' 'saveSettings'
+  addItem menu 'quit GP' 'confirmToQuit'
+  popUp menu (global 'page') 150 -50 1
+}
+
+method confStageResolution Page {
+  setGlobal 'stageResolution' (prompt (global 'page') 'Stage-Resolution:' '800')
+}
+
+method confStageRatio Page {
+  answ = (prompt (global 'page') 'Stage-Ratio:' '16:10')
+  if (answ == '') {return}
+  x = (indexOf (letters answ) ':')
+  setGlobal 'stageRatio' (list (toNumber (substring answ 1 (x - 1))) (toNumber (substring answ (x + 1))))
+}
+
+method confKeyboardHotfix Page {
+  setGlobal 'keyboardHotfix' (confirm (global 'page') 'keyboardHotfix ' (join 'enable keyboard' (newline) 'hotfix for Linux?') 'yes' 'no')
+  openSettings (last (allInstances 'ProjectEditor'))
+}
+
+method confFullscreen Page {
+  setGlobal 'fullscreen' (confirm (global 'page') 'Fullscreen presentation  ' 'Present in full screen?' 'yes' 'no')
+  openSettings (last (allInstances 'ProjectEditor'))
+}
+
+
+method showSettingsHelp Page {
+  ok = (confirm (global 'page') 'GP Settings Help Page' (join 'Welcome to the GP Settings Manager!' (newline) (newline) 'You will be guided through' (newline) 'the following configurations:' (newline) '> stage ratio          ' (newline) '> stage resolution' (newline) '> keyboard hotfix ' (newline) '> fullscreen    ' (newline) (newline) 'more comming soon ...' (newline) (newline) (newline) 'by MSandro') 'back' 'close' (nil))
+if (not ok) {return}
+openSettings (last (allInstances 'ProjectEditor'))
+return
+}
+// end of Settings
 
 method clearProject ProjectEditor {
   // Remove old project morphs and classes and reset global state.
@@ -396,6 +449,9 @@ method showTab ProjectEditor newTab {
 // presentation mode
 
 method enterPresentation ProjectEditor {
+	if (global 'fullscreen') {
+	  setFullScreen true	
+	}
 	page = (global 'page')
 	if (notNil (focus (keyboard page))) {
 	  cancel (focus (keyboard page))
