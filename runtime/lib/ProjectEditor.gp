@@ -44,7 +44,7 @@ to openProjectEditor tryRetina devMode presentFlag appFlag {
   }
   setDevMode page devMode
   setGlobal 'page' page
-  open page tryRetina
+  open page tryRetina 'GPower (Based on GP - Modified by MSandro)'
   editor = (initialize (new 'ProjectEditor') (emptyProject))
   addPart page editor
   if (notNil (global 'initialProject')) {
