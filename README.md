@@ -1,7 +1,8 @@
 # GPower
 ## based on GP
 
-This is my frist GP modification it will contain several improvements for advanced GP programmers. 
+This is my frist GP modification it will contain several improvements for advanced GP programmers. The modification will also be the default for my BootToGP. That's why I'm going to add some OS specific features soon.
+
 
 ### What I've already done:
 - improved the AppMaker
