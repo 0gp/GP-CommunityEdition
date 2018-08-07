@@ -38,9 +38,9 @@ to openProjectEditor tryRetina devMode presentFlag appFlag {
   if (isNil (global 'alanMode')) { setGlobal 'alanMode' false }
   if (isNil (global 'vectorTrails')) { setGlobal 'vectorTrails' false }
   if (and ('Browser' == (platform)) (browserIsMobile)) {
-	page = (newPage 1024 640)
+	page = (newPage 1024 640 (gray 0))
   } else {
-	page = (newPage 1120 700)
+	page = (newPage 1120 700 (gray 0))
   }
   setDevMode page devMode
   setGlobal 'page' page
@@ -59,6 +59,12 @@ to openProjectEditor tryRetina devMode presentFlag appFlag {
   if appFlag {
     clearProject editor
     openProjectFromFile (last (allInstances 'Stage')) 'project.gpp'
+  }
+  if (and (global 'embed') (not appFlag) ) {
+    presentFlag = true
+    clearProject editor
+    enterPresentation editor
+    openProjectFromFile (last (allInstances 'Stage')) (global 'projectPath')
   }
   startSteppingSafely page presentFlag
   broadcast 'go'
@@ -83,7 +89,7 @@ method initialize ProjectEditor aProject {
   addTopBarParts this
   scripter = (initialize (new 'Scripter') this)
   addPart morph (morph scripter)
-  stage = (newStage (at (global 'stageRatio') 1) (at (global 'stageRatio') 2))
+  stage = (newStage (at (global 'stageResolution') 1) (at (global 'stageResolution') 2))
   addPart morph (morph stage)
   library = (initialize (new 'SpriteLibrary') scripter)
   addPart morph (morph library)
@@ -180,10 +186,10 @@ method newProject ProjectEditor {
 }
 
 //Settings by MSandro
-method openSettings ProjectEditor {
+to openSettings {
   menu = (menu 'GP Settings' (global 'page'))
-  addItem menu 'stage ratio' 'confStageRatio'
   addItem menu 'stage resolution' 'confStageResolution'
+  //addItem menu 'stage color' 'confStageColor'
   addItem menu 'keyboard hotfix' 'confKeyboardHotfix'
   addItem menu 'Fullscreen presentation' 'confFullscreen'
   //addItem menu 'defaults' 'confDefaults'
@@ -195,29 +201,29 @@ method openSettings ProjectEditor {
   popUp menu (global 'page') 150 -50 1
 }
 
-method confStageResolution Page {
-  setGlobal 'stageResolution' (prompt (global 'page') 'Stage-Resolution:' '800')
-}
-
-method confStageRatio Page {
-  answ = (prompt (global 'page') 'Stage-Ratio:' '16:10')
+to confStageResolution {
+  answ = (prompt (global 'page') 'Stage-Resolution:' '1920x1080')
   if (answ == '') {return}
-  x = (indexOf (letters answ) ':')
-  setGlobal 'stageRatio' (list (toNumber (substring answ 1 (x - 1))) (toNumber (substring answ (x + 1))))
+  x = (indexOf (letters answ) 'x')
+  setGlobal 'stageResolution' (list (toNumber (substring answ 1 (x - 1))) (toNumber (substring answ (x + 1))))
 }
 
-method confKeyboardHotfix Page {
+to confStageColor {
+addPart (global 'page') (newColorPicker (action (action (function a {setGlobal 'stageColor' (toString a)}))) (colorFromSwatch (colorSwatch 255 255 255 255)))
+}
+
+to confKeyboardHotfix {
   setGlobal 'keyboardHotfix' (confirm (global 'page') 'keyboardHotfix ' (join 'enable keyboard' (newline) 'hotfix for Linux?') 'yes' 'no')
   openSettings (last (allInstances 'ProjectEditor'))
 }
 
-method confFullscreen Page {
+to confFullscreen {
   setGlobal 'fullscreen' (confirm (global 'page') 'Fullscreen presentation  ' 'Present in full screen?' 'yes' 'no')
   openSettings (last (allInstances 'ProjectEditor'))
 }
 
 
-method showSettingsHelp Page {
+to showSettingsHelp {
   ok = (confirm (global 'page') 'GP Settings Help Page' (join 'Welcome to the GP Settings Manager!' (newline) (newline) 'You will be guided through' (newline) 'the following configurations:' (newline) '> stage ratio          ' (newline) '> stage resolution' (newline) '> keyboard hotfix ' (newline) '> fullscreen    ' (newline) (newline) 'more comming soon ...' (newline) (newline) (newline) 'by MSandro') 'back' 'close' (nil))
 if (not ok) {return}
 openSettings (last (allInstances 'ProjectEditor'))
