@@ -1,6 +1,7 @@
 {
+	"embed": false, 
 	"fullscreen": true, 
 	"keyboardHotfix": false, 
-	"stageRatio": [16, 9], 
-	"stageResolution": "1280"
+	"projectPath": "test.gpp", 
+	"stageResolution": [1280, 720]
 }
