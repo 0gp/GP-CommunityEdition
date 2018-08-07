@@ -292,7 +292,9 @@ method categories Scripter {
   } else {
 	result = (userModeCategories this)
   }
-  result = (join result (extraCategories (project projectEditor)))
+  if (notNil (project projectEditor)) {
+    result = (join result (extraCategories (project projectEditor)))
+  }
   return result
 }
 
