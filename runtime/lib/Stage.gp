@@ -33,35 +33,9 @@ method initialize Stage w h {
   morph = (newMorph this)
   setClipping morph true
   setTransparentTouch morph true
-  color = (gray 240)
-  setAspectRatio this w h
+  color = (gray 0)
+  setCostume morph (newBitmap w h color)
   return this
-}
-
-method setAspectRatio Stage w h {
-  majorAxis = (toInteger (global 'stageResolution'))
-  if (or (isNil w) (isNil h)) {
-	w = 16
-	h = 10
-  }
-  if (w > h) {
-	newW = majorAxis
-    newH = (round ((h * majorAxis) / w) 2)
-  } else {
-	newW = (round ((w * majorAxis) / h) 2)
-	newH = majorAxis
-  }
-  oldW = (width morph)
-  oldH = (height morph)
-  bm = (costumeData morph)
-  if (or (isNil bm) ((width bm) != newW) ((height bm) != newH)) {
-	setCostume morph (newBitmap newW newH color)
-  }
-  if (or (oldW == 0) (oldH == 0)) {
-	oldW = newW
-	oldH = newH
-  }
-  scaleToFit this oldW oldH
 }
 
 method scaleToFit Stage w h {
