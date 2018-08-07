@@ -490,14 +490,14 @@ method processEvent Keyboard evt {
   if (and (1 <= key) (key <= 255)) {
     if (type == 'keyDown') {
 	  if (and (27 == key) (isInPresentationMode this)) {
-		if (not (global 'app')) {		
+		if (not (or (global 'app') (global 'embed') )) {		
 		  stopAll page
 		  exitPresentationMode page
 		}
 		return
 	  }
       if (and (27 == key) (isNil focus)) { // escape key
-        if (not (global 'app')) {
+        if (not (or (global 'app') (global 'embed') )) {
           stopAll page
         }
         return
@@ -1081,7 +1081,7 @@ method wantsDropOf Page aHandler {
 }
 
 method rightClicked Page {
-  if (not (global 'app')) {
+  if (not (or (global 'app') (global 'embed') )) {
     popUpAtHand (contextMenu this) this
   }
   return true
