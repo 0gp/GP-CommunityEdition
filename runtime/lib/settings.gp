@@ -2,7 +2,7 @@ defineClass settings morph
 
 to saveSettings {
   local 'dict' (dictionary)
-  local 'keys' (list 'stageRatio' 'stageResolution' 'keyboardHotfix' 'fullscreen')
+  local 'keys' (list 'embed' 'projectPath' 'stageResolution' 'keyboardHotfix' 'fullscreen')
   for i keys {
     add dict i (global i)
   }
