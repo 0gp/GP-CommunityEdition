@@ -44,7 +44,7 @@ to openProjectEditor tryRetina devMode presentFlag appFlag {
   }
   setDevMode page devMode
   setGlobal 'page' page
-  open page tryRetina 'GP CommunityEdition'
+  open page tryRetina 'GP CommunityEdition - Based on GP Blocks'
   editor = (initialize (new 'ProjectEditor') (emptyProject))
   addPart page editor
   if (notNil (global 'initialProject')) {
