@@ -106,7 +106,9 @@ method loadPage Stage projectPage {
 	placeRotationCenter m x y
 	addPart morph m
   }
-  clearLibrary (library (findProjectEditor))
+  if (notNil (findProjectEditor)) {
+  	clearLibrary (library (findProjectEditor))
+}
 }
 
 method unloadPage Stage projectPage {
