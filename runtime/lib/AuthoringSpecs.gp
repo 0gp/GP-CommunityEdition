@@ -171,6 +171,8 @@ method blockColorForCategory AuthoringSpecs cat {
   } ('Variables' == cat) {
 	if (notNil (global 'variableColor')) { return (global 'variableColor') }
 	return (color 243 118 29)
+  } ('Developer' == cat) {
+	return (color 200 200 200)
   } (isOneOf cat 'Operators' 'Math') {
 	if (notNil (global 'operatorsColor')) { return (global 'operatorsColor') }
 	return (color 98 194 19)
@@ -403,9 +405,7 @@ method initialSpecs AuthoringSpecs {
 	  (array 'r' '>>>'				'_ >>> _' 'num num' -1 20)
 
 	'Data'
-	  (array 'r' 'list'				'list : _ : ...' 'auto auto auto auto auto auto auto auto auto auto' 1 2 3 4 5 6 7 8 9 10)
-	  (array 'r' 'dictionary'		'dictionary')
-
+	  (array 'r' 'list'			'list : _ : ...' 'auto auto auto auto auto auto auto auto auto auto' 1 2 3 4 5 6 7 8 9 10)
 	  (array 'r' 'count'			'count _' 'str')
 	  (array 'r' 'isEmpty'			'is _ empty?' 'data')
 	  (array 'r' 'contains'			'does _ contain _ ?' 'data auto')
@@ -442,6 +442,21 @@ method initialSpecs AuthoringSpecs {
 	  (array 'r' 'lastIndexOf'		'in _ find last _ : before _' 'list auto num' nil nil 100)
 
 	  (array 'r' 'toList'			'to list _ ' 'data')
+
+	'Dictionary'
+	  (array 'r' 'dictionary'		'dictionary')
+	  (array 'r' 'keys'			'key of _' 'dict')
+	  (array 'r' 'values'			'values of _' 'dict')
+	  (array 'r' 'count'			'count _' 'dict')
+	  (array 'r' 'copy'			'copy _' 'dict')
+	  (array 'r' 'serialize'		'serialize _' 'dict')
+	  (array ' ' 'add'			'add to _ key _ val _' 'dict auto auto' )
+	  (array ' ' 'addAll'			'add all _ elements _' 'dict auto')
+	  (array ' ' 'remove'			'remove _ key _' 'dict auto')
+	  (array ' ' 'removeAll'		'remove all _ elements _' 'dict auto')
+	  (array ' ' 'sortedPairs'		'sort _ by key _' 'dict true')
+	  (array ' ' 'deserialize'		'deserialize _ _ list _' 'dict auto auto')
+	  (array ' ' 'atNewIndexPut'		'add to _ at index _ key _ value _' 'dict auto auto auto')
 
 	'Words'
 	  (array 'r' 'letters'			'letters _' 'str' 'Hello')
@@ -713,6 +728,11 @@ Line 2')
 	  (array ' ' 'setBlockColors'		'set block colors _ _ _ _' 'color color color color')
 	  (array ' ' 'setBlockTextColor'	'set block text color _' 'color')
 	  (array ' ' 'resetBlockColors'		'reset block colors')
+	  (array ' ' 'setFullScreen'		'set Fullscreen _' 'bool' true)
+	  (array 'r' 'getClipboard'		'get Clipboard')
+	  (array ' ' 'setClipboard'		'set Clipboard _' 'str' 'Text')
+	  (array ' ' 'selfLaunch'		'launch for _ _' 'obj cmd')
+	  (array ' ' 'selfLaunchText'		'launch for _ _' 'obj str' '' 'print 42')
 
 	'Generic'
 	  (array ' ' 'initialize'			'initialize _' 'this')

@@ -45,6 +45,9 @@ method createEmbeddedFS AppMaker project {
 	  if ('startup.gp' == fn) {
 		startup = (readEmbeddedFile fn)
 	  }
+	  if ('settings.json' == fn) {
+		settings = (readEmbeddedFile fn)
+	  }
 	}
 	for fn (listEmbeddedFiles) {
 	  if (beginsWith fn 'modules/') {
@@ -76,15 +79,16 @@ method createEmbeddedFS AppMaker project {
 	  }
 	}
 	startup = (readFile (join (directoryPart (appPath)) '/runtime/startup.gp'))
+	settings = (readFile (join (directoryPart (appPath)) '/runtime/settings.json'))
   }
   if (notNil project) {
-	// add startup.gp and project file
+	// add startup.gp, settings.json and project file
 	addFile zip 'startup.gp' (startupFile this) true
-	if (notNil project) {
-	  addFile zip 'project.gpp' (projectData2 project) true
-	}
+	addFile zip 'settings.json' settings true
+	addFile zip 'project.gpp' (projectData2 project) true
   } else {
 	addFile zip 'startup.gp' startup true
+	addFile zip 'settings.json' settings true
   }
   return zip
 }
@@ -92,12 +96,9 @@ method createEmbeddedFS AppMaker project {
 method startupFile AppMaker {
   return '
 to startup {
-  setGlobal ''vectorTrails'' false
-  openPage true
-  openProjectFromFile (newStage) ''project.gpp''
-  gc
-  print (mem)
-  startSteppingSafely (global ''page'') true
+  setGlobal ''app'' true
+  loadSettings
+  openProjectEditor true false true true
 }
 '
 }

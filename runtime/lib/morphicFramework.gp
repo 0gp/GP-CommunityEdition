@@ -490,18 +490,22 @@ method processEvent Keyboard evt {
   if (and (1 <= key) (key <= 255)) {
     if (type == 'keyDown') {
 	  if (and (27 == key) (isInPresentationMode this)) {
-		stopAll page
-		exitPresentationMode page
+		if (not (or (global 'app') (global 'embed') )) {		
+		  stopAll page
+		  exitPresentationMode page
+		}
 		return
 	  }
       if (and (27 == key) (isNil focus)) { // escape key
-        stopAll page
+        if (not (or (global 'app') (global 'embed') )) {
+          stopAll page
+        }
         return
       } (and (13 == key) (isNil focus) (shiftKeyDown this)) { // shift-enter initiates keyboard editing for blocks
         startEditingScripts
         return
       }
-      if (at currentKeys key) { return } // suppress duplicated keyDown events on Gnome and some other Linux desktops
+      if (and (at currentKeys key) (global 'keyboardHotfix')) { return } // suppress duplicated keyDown events on Gnome and some other Linux desktops
       atPut currentKeys key true
 	  if (isNil focus) {
         keyName = nil
@@ -951,6 +955,7 @@ method stopAll Page {
 }
 
 method exitPresentationMode Page {
+  setFullScreen false
   for m (copy (parts morph)) {
 	if (isClass (handler m) 'ScripterMenuBar') { exitPresentation (handler m) }
 	if (isClass (handler m) 'ProjectEditor') { exitPresentation (handler m) }
@@ -1080,7 +1085,9 @@ method wantsDropOf Page aHandler {
 }
 
 method rightClicked Page {
-  popUpAtHand (contextMenu this) this
+  if (not (or (global 'app') (global 'embed') )) {
+    popUpAtHand (contextMenu this) this
+  }
   return true
 }
 
