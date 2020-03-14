@@ -24,5 +24,5 @@ to startup {
   setGlobal 'app' false
   setGlobal 'vectorTrails' false
   loadSettings
-  openProjectEditor true true
+  openProjectEditor true false
 }
