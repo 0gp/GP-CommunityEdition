@@ -14,5 +14,5 @@ This branch makes possible loading any custom runtime folder after loading the V
 ## What Doesn't work
 
   - Appmaker doesn't
-  - This currently only load libraries and startup.gp. It will not load any other file of the runtime folder
+  - This currently only load libraries and startup.gp. It will not load any other file of the runtime folder (for example the settings.json of Gpower is added in the main runtime folder to have it loaded)
   - Others...
