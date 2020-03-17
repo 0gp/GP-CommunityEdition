@@ -23,7 +23,6 @@ print '  go - restart the user interface'
 to startup {
   setGlobal 'app' false
   setGlobal 'vectorTrails' false
-  print 'Settings loaded'
   loadSettings
   openProjectEditor true true
 }

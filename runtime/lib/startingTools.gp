@@ -3,7 +3,7 @@
 
 
 to loadRuntime runtimeName {
-  relativePath = (joinStringArray (array 'runtime/additional runtimes/' runtimeName))
+  relativePath = (joinStringArray (array 'runtime/additionalRuntimes/' runtimeName))
   additionalLibFolder = (joinStringArray (array relativePath '/lib'))
   fList = (listFiles additionalLibFolder)
   for f fList { 
