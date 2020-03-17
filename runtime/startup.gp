@@ -7,7 +7,7 @@
 
 // This loads the additional libraries
 print '--- Loading additional runtime ...'
-loadRuntime 'Default'
+loadRuntime 'Gpower'
 print '--- Additional runtime loaded'
 
 

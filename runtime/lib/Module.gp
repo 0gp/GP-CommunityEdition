@@ -225,7 +225,7 @@ method loadClassDefinitions Module cmdList {
 	  args = (toList (argList cmd))
 	  className = (removeFirst args)
 	  if (contains classDefs className) {
-		print 'Warning: Multple definitions of class' className 'in module' moduleName
+		print 'Warning: Multiple definitions of class' className 'in module' moduleName
 	  } else {
 		atPut classDefs className (list)
 	  }
