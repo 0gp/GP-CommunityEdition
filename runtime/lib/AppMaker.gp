@@ -61,6 +61,15 @@ method createEmbeddedFS AppMaker project {
 		error 'Could not find library folder'
 	  }
 	}
+	for fn (listFiles (join prefix 'additionalRuntimes/' (getRuntimeName) '/lib')){ // Add the additional Runtime libraries as main runtimes
+	  if (not (isOneOf fn '.DS_Store' '.' '..')) {
+	    fullName = (join 'additionalRuntimes/' (getRuntimeName) '/lib/' fn)
+		print (join prefix fullName)
+		print (join 'lib/' fn)
+		data = (readFile (join prefix fullName))
+		addFile zip (join 'lib/' fn) data true
+	  }
+	}
 	for fn (listFiles (join prefix 'lib')) {
 	  if (not (isOneOf fn '.DS_Store' '.' '..')) {
 	    fullName = (join 'lib/' fn)

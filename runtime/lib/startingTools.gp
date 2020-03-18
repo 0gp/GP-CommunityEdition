@@ -10,16 +10,20 @@ to loadRuntime runtimeName {
     
     lib = (readFile (joinStringArray (array additionalLibFolder '/' f ))) // Read .gp file from library folder
 	loadModuleFromString (topLevelModule) lib // Load module from file
-    print (joinStringArray (array f ' loaded !'))
   }
   print (joinStringArray (array '--- ' (toString (count fList)) ' libraries loaded from ''' additionalLibFolder ''''))
   loadModuleFromString (topLevelModule) (readFile (joinStringArray (array relativePath '/startup.gp'))) // Load the startup function from the additional runtime
   print '--- startup.gp loaded'
-  
+  loadModuleFromString (topLevelModule) (join 'to getRuntimeName { 
+  return ''' runtimeName '''
+}') // Create a global reporter for additional runtime name
   
 }
 
-
+to readRuntimeFile fn {
+  // This function makes easy to read files in the additional runtime folder
+  return (readFile (joinStringArray (array 'runtime/additionalRuntimes/' (getRuntimeName) '/' fn)))
+}
 
 // --- Integer.gp ---
 

@@ -7,8 +7,6 @@
 
 // This loads the additional libraries
 print '--- Loading additional runtime ...'
-loadRuntime 'Gpower'
+loadRuntime 'Default' // Change to the additionalRuntimes subFolder you want
 print '--- Additional runtime loaded'
-
-
-//
+print (getRuntimeName)

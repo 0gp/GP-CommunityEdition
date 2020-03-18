@@ -117,7 +117,7 @@ method addFunction Module aFunction {
   if (notNil (indexOf functions aFunction)) { return } // already there
   for f functions {
 	if ((functionName f) == (functionName aFunction)) {
-	  error (join 'This modue already has a function named' (functionName aFunction))
+	  error (join 'This module already has a function named' (functionName aFunction))
 	}
   }
   setField aFunction 'module' this
