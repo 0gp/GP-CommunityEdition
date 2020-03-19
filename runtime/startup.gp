@@ -6,7 +6,7 @@
 
 
 // This loads the additional libraries
-print '--- Loading additional runtime ...'
-loadRuntime 'Default' // Change to the additionalRuntimes subFolder you want
-print '--- Additional runtime loaded'
-print (getRuntimeName)
+print '--- Loading core ...'
+loadCore 'Default' // Change to the core subFolder you want
+print '--- Core loaded'
+print (getCoreName)

@@ -1,28 +1,32 @@
-// Those functions need to be loaded by the VM to make possible loading additional runtime folders after
+// Those functions need to be loaded by the VM to make possible loading a core library after
 // loading the VM
 
 
-to loadRuntime runtimeName {
-  relativePath = (joinStringArray (array 'runtime/additionalRuntimes/' runtimeName))
+to loadCore coreName {
+  relativePath = (joinStringArray (array 'runtime/cores/' coreName))
   additionalLibFolder = (joinStringArray (array relativePath '/lib'))
   fList = (listFiles additionalLibFolder)
   for f fList { 
     
-    lib = (readFile (joinStringArray (array additionalLibFolder '/' f ))) // Read .gp file from library folder
+    lib = (readFile (joinStringArray (array additionalLibFolder '/' f ))) // Read .gp file from core's library folder
 	loadModuleFromString (topLevelModule) lib // Load module from file
   }
   print (joinStringArray (array '--- ' (toString (count fList)) ' libraries loaded from ''' additionalLibFolder ''''))
   loadModuleFromString (topLevelModule) (readFile (joinStringArray (array relativePath '/startup.gp'))) // Load the startup function from the additional runtime
   print '--- startup.gp loaded'
-  loadModuleFromString (topLevelModule) (join 'to getRuntimeName { 
-  return ''' runtimeName '''
+  loadModuleFromString (topLevelModule) (join 'to getCoreName { 
+  return ''' coreName '''
 }') // Create a global reporter for additional runtime name
   
 }
 
-to readRuntimeFile fn {
-  // This function makes easy to read files in the additional runtime folder
-  return (readFile (joinStringArray (array 'runtime/additionalRuntimes/' (getRuntimeName) '/' fn)))
+to readCoreFile fn {
+  // This function makes easy to read files from cores folder
+  if (isEmpty (listEmbeddedFiles)) {
+    return (readFile (joinStringArray (array 'runtime/cores/' (getCoreName) '/' fn)))
+  } else {
+    return (readEmbeddedFile (joinStringArray (array 'cores/' (getCoreName) '/' fn)))
+  }
 }
 
 // --- Integer.gp ---
@@ -182,4 +186,5 @@ method copyWithout Array omitEl {
 method first Array { return (at this 1) }
 method last Array { return (at this (count this)) }
 
-
+to isEmpty collection { return ((count collection) == 0) }
+to notEmpty collection { return ((count collection) > 0) }

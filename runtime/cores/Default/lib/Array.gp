@@ -447,9 +447,6 @@ method arrayShift Array shift {
 
 // operations for indexable collections
 
-to isEmpty collection { return ((count collection) == 0) }
-to notEmpty collection { return ((count collection) > 0) }
-
 to atRandom collection { return (at collection (rand 1 (count collection))) }
 
 to flattened collection result {

@@ -61,13 +61,20 @@ method createEmbeddedFS AppMaker project {
 		error 'Could not find library folder'
 	  }
 	}
-	for fn (listFiles (join prefix 'additionalRuntimes/' (getRuntimeName) '/lib')){ // Add the additional Runtime libraries as main runtimes
+	for fn (listFiles (join prefix 'cores/' (getCoreName) '/lib')){
+	  // Add the core libraries to the zipFile
 	  if (not (isOneOf fn '.DS_Store' '.' '..')) {
-	    fullName = (join 'additionalRuntimes/' (getRuntimeName) '/lib/' fn)
-		print (join prefix fullName)
-		print (join 'lib/' fn)
+	    fullName = (join 'cores/' (getCoreName) '/lib/' fn)
 		data = (readFile (join prefix fullName))
 		addFile zip (join 'lib/' fn) data true
+	  }
+	}
+	for fn (listFiles (join prefix 'cores/' (getCoreName))) {
+	  // Add the core files to the zipFile
+	  if (not (isOneOf fn '.DS_Store' '.' '..' 'startup.gp')) {
+	    fullName = (join 'cores/' (getCoreName) '/' fn)
+		data = (readFile (join prefix fullName))
+		addFile zip fullName data true
 	  }
 	}
 	for fn (listFiles (join prefix 'lib')) {
@@ -99,7 +106,11 @@ method createEmbeddedFS AppMaker project {
 }
 
 method startupFile AppMaker {
-  return '
+  return (join '
+to getCoreName {
+  return ''' (getCoreName) '''
+}
+
 to startup {
   setGlobal ''vectorTrails'' false
   openPage true
@@ -108,7 +119,7 @@ to startup {
   print (mem)
   startSteppingSafely (global ''page'') true
 }
-'
+')
 }
 
 method executableWithData AppMaker data {
