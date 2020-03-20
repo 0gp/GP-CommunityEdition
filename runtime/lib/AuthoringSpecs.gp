@@ -34,7 +34,7 @@ method addSpecs AuthoringSpecs newSpecs {
   for entry newSpecs {
 	add specsList entry
 	if (isClass entry 'String') {
-	  category = entry
+	  if ('-' != entry) { category = entry }
 	} else {
 	  op = (at entry 2)
 	  specsForOp = (at specsByOp op (list))
@@ -54,7 +54,7 @@ method recordBlockSpec AuthoringSpecs op spec {
   // Record a block spec for the give op. Called when creating/changing functions and methods.
   editor = (findProjectEditor)
   if (isNil editor) { return } // should not happen
-  atPut (blockSpecs (project editor)) op spec
+  recordBlockSpec (project editor) op spec
 }
 
 // queries
@@ -135,7 +135,11 @@ method specsFor AuthoringSpecs category {
   currentCategory = ''
   for entry specsList {
 	if (isClass entry 'String') {
-	  currentCategory = entry
+	  if ('-' == entry) {
+		if (currentCategory == category) { add result '-' }
+	  } else {
+		currentCategory = entry
+	  }
 	} (currentCategory == category) {
 	  add result (specForEntry this entry)
 	}
@@ -244,6 +248,10 @@ method setLanguage AuthoringSpecs newLang {
 	translationData = (readFile (join 'translations/' newLang '.txt'))
   }
   if (isNil translationData) {
+	// if still nil, we may be in the wrong dir
+	translationData = (readFile (join '../translations/' newLang '.txt'))
+  }
+  if (isNil translationData) {
 	language = 'English'
 	translationDictionary = nil
   } else {
@@ -274,22 +282,48 @@ method needsTranslation AuthoringSpecs spec {
   return false
 }
 
-method installTranslation AuthoringSpecs translationData {
+method installTranslation AuthoringSpecs translationData langName {
   // Translations data is string consisting of three-line entries:
   //	original string
   //	translated string
   //	<blank line>
   //	...
+  // Lines starting with # are treated as comments
 
   translationDictionary = (dictionary)
   lines = (toList (lines translationData))
   while ((count lines) >= 2) {
 	from = (removeFirst lines)
-	to = (removeFirst lines)
-	atPut translationDictionary from to
-	while (and ((count lines) > 0) ((removeFirst lines) != '')) {
-	  // skip lines until the next blank line
+	// ignore comments and blank lines
+	while (and
+			((count lines) >= 2)
+			(or (beginsWith from '#') (from == ''))) {
+		from = (removeFirst lines)
 	}
+	if ((count lines) >= 1) {
+		to = (removeFirst lines)
+		atPut translationDictionary from to
+	}
+  }
+  if (notNil langName) { language = langName }
+}
+
+to localized aString {
+  localization = (localizedOrNil aString)
+  if (or (isNil localization) (localization == '--MISSING--')) {
+	return aString
+  } else {
+	return localization
+  }
+}
+
+to localizedOrNil aString {
+  if (isNil aString) { return nil }
+  dict = (getField (authoringSpecs) 'translationDictionary')
+  if (isNil dict) {
+	return aString
+  } else {
+	return (at dict aString)
   }
 }
 
@@ -529,7 +563,7 @@ Line 2')
 	  (array ' ' 'self_placePart'		'place part _ left inset _ top inset _' 'obj num num' nil 10 10)
 
 	'Looks'
-	  (array ' ' 'self_setCostume'		'set costume to _' 'menu.imageMenu' 'ship')
+	  (array ' ' 'self_setCostume'		'set costume to _' 'menu.imageMenu' 'GP')
 	  (array ' ' 'self_setTextCostume'	'set text costume _ : color _ : fontName _ fontSize _' 'auto color str num' 'Hello!' nil 'Arial Bold Italic' 120)
 	  (array ' ' 'self_show'			'show')
 	  (array ' ' 'self_hide'			'hide')
@@ -541,10 +575,10 @@ Line 2')
 	  (array ' ' 'self_comeToFront'		'come to front')
 	  (array ' ' 'self_goBackBy'		'go back by _' 'num' 1)
 	  (array ' ' 'self_setTransparency'	'set transparency _' 'num' 50)
-	  (array 'r' 'self_getWidth'		'width : of _' 'menu.imageMenu' 'ship')
-	  (array 'r' 'self_getHeight'		'height : of _' 'menu.imageMenu' 'ship')
-	  (array ' ' 'self_setStageColor'	'set background color _ : image _' 'color menu.imageMenu' nil 'ship')
-	  (array 'r' 'self_costume'			'costume : _' 'menu.imageMenu' 'ship')
+	  (array 'r' 'self_getWidth'		'width : of _' 'menu.imageMenu' 'GP')
+	  (array 'r' 'self_getHeight'		'height : of _' 'menu.imageMenu' 'GP')
+	  (array ' ' 'self_setStageColor'	'set background color _ : image _' 'color menu.imageMenu' nil 'GP')
+	  (array 'r' 'self_costume'			'costume : _' 'menu.imageMenu' 'GP')
 	  (array ' ' 'self_snapshotCostume'	'snapshot costume : as _' 'str' 'snapshot')
 	  (array ' ' 'self_snapshotStage'	'snapshot stage : as _' 'str' 'snapshot')
 	  (array ' ' 'self_setPinXY'		'set rotation point x _ y _' 'num num' 0 0)
@@ -555,11 +589,11 @@ Line 2')
 	  (array ' ' 'self_fillRect'		'fill rectangle x _ y _ w _ h _ _ : roundness _' 'num num num num color num' 10 10 50 50 nil 8)
 	  (array ' ' 'self_fillCircle'		'fill circle center x _ y _ radius _ _ : border _ _' 'num num num color num color' 50 50 30 nil 4)
 	  (array ' ' 'self_drawLine'		'draw line from _ _ to _ _ _ : width _' 'num num num num color num' 0 0 100 150 nil 3)
-	  (array ' ' 'self_drawBitmap'		'draw image _ : x _ y _ : scale _ : alpha _' 'menu.imageMenu num num num num' 'ship' 0 0 1 255)
+	  (array ' ' 'self_drawBitmap'		'draw image _ : x _ y _ : scale _ : alpha _' 'menu.imageMenu num num num num' 'GP' 0 0 1 255)
 	  (array 'r' 'randomColor'			'random color')
 	  (array 'r' 'transparent'			'transparent')
-	  (array 'r' 'self_getWidth'		'width : of _' 'menu.imageMenu' 'ship')
-	  (array 'r' 'self_getHeight'		'height : of _' 'menu.imageMenu' 'ship')
+	  (array 'r' 'self_getWidth'		'width : of _' 'menu.imageMenu' 'GP')
+	  (array 'r' 'self_getHeight'		'height : of _' 'menu.imageMenu' 'GP')
 	  (array ' ' 'self_setFont'			'set font name _ : size _' 'str num' 'Arial' 24)
 	  (array 'r' 'fontHeight'			'font height')
 	  (array 'r' 'stringWidth'			'string width _' 'str' 'Hello!')
@@ -593,9 +627,9 @@ Line 2')
 
 	'Pixels'
 	  (array ' ' 'self_createCostume'	'set width _ height _ : fill _ ' 'num num color' 100 100)
-	  (array ' ' 'self_copycostume'	'copy costume from _' 'menu.imageMenu' 'ship')
-	  (array 'r' 'self_getPixels'	'pixels : from _' 'menu.imageMenu' 'ship')
-	  (array 'r' 'self_getPixelXY'	'pixel at x _ y _ : from _ ' 'num num menu.imageMenu' 1 1 'ship')
+	  (array ' ' 'self_copycostume'	'copy costume from _' 'menu.imageMenu' 'GP')
+	  (array 'r' 'self_getPixels'	'pixels : from _' 'menu.imageMenu' 'GP')
+	  (array 'r' 'self_getPixelXY'	'pixel at x _ y _ : from _ ' 'num num menu.imageMenu' 1 1 'GP')
 	  (array 'r' 'getRed'			'red of _' 'pixel' nil)
 	  (array 'r' 'getGreen'			'green of _' 'pixel' nil)
 	  (array 'r' 'getBlue'			'blue of _' 'pixel' nil)
@@ -609,8 +643,8 @@ Line 2')
 	  (array ' ' 'setColor'			'set color of _ to _' 'pixel color' nil)
 	  (array 'r' 'randomColor'		'random color')
 	  (array 'r' 'transparent'		'transparent')
-	  (array 'r' 'self_getWidth'	'width : of _' 'menu.imageMenu' 'ship')
-	  (array 'r' 'self_getHeight'	'height : of _' 'menu.imageMenu' 'ship')
+	  (array 'r' 'self_getWidth'	'width : of _' 'menu.imageMenu' 'GP')
+	  (array 'r' 'self_getHeight'	'height : of _' 'menu.imageMenu' 'GP')
 	  (array 'r' 'self_getPixel'	'pixel color at x _ y _ : in _ ' 'num num image' 1 1)
 	  (array ' ' 'self_setPixel'	'set pixel color at x _ y _ to _ : in _' 'num num color image' 1 1)
 
