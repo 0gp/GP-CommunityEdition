@@ -663,6 +663,7 @@ method open Page tryRetina title {
   setGlobal 'scale' 1
   setGlobal 'flat' true
   setGlobal 'flatBlocks' false
+  if (isNil title) { title = 'GP Community Edition' }
   setGlobal 'stealthBlocks' false
   setGlobal 'stealthLevel' -50
   setClipping morph true
@@ -1088,7 +1089,7 @@ method rightClicked Page {
 
 method contextMenu Page {
   menu = (menu 'GP' this)
-  addItem menu 'GP version...' 'showGPVersion'
+  addItem menu 'GP Mod version...' 'showGPVersion'
   addLine menu
   addItem menu 'show all' 'showAll' 'move any offscreen objects back into view'
   if (devMode) {
@@ -1120,7 +1121,7 @@ method contextMenu Page {
 }
 
 method showGPVersion Page {
-  inform this (join 'GP Version ' (libraryVersion) (newline) (at (version) 1))
+  inform this (join 'GP Mod Version ' (libraryVersion) (newline) (at (version) 1))
 }
 
 method broadcastGo Page { stopAll this; broadcast 'go' }
@@ -1142,7 +1143,7 @@ method addTurtle Page {
   addPart this t
 }
 
-method confirmToQuit Page {confirm this nil (join 'Are you sure' (newline) 'you want to quit GP?') nil nil 'exit'}
+method confirmToQuit Page {confirm this nil (join 'Are you sure' (newline) 'you want to quit?') nil nil 'exit'}
 
 // foreground layer
 
