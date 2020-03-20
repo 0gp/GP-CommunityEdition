@@ -29,6 +29,10 @@ to readCoreFile fn {
   }
 }
 
+to writeCoreFile fn data {
+  writeFile (joinStringArray (array 'runtime/cores/' (getCoreName) '/' fn)) data
+}
+
 // --- Integer.gp ---
 
 method floor Integer { return this }

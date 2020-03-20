@@ -6,15 +6,15 @@ to saveSettings {
   for i keys {
     add dict i (global i)
   }
-  self_writeFile (join (runtimeFolder) 'settings.json') (stringify (initialize (new 'JSONWriter')) dict true)
+  writeCoreFile 'settings.json' (stringify (initialize (new 'JSONWriter')) dict true)
   inform (global 'page') 'Save operation completed'
 }
 
 to loadSettings {
   if (global 'app') {
-    local 'dict' (jsonParse (readEmbeddedFile 'settings.json'))
+    local 'dict' (jsonParse (readCoreFile 'settings.json'))
   } else {
-    local 'dict' (jsonParse (self_readFile (join (runtimeFolder) 'settings.json')))
+    local 'dict' (jsonParse (readCoreFile 'settings.json'))
   }
 
   for i (keys dict) {

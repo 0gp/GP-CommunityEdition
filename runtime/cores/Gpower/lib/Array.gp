@@ -11,9 +11,6 @@ method contains Array element {
   return false
 }
 
-method first Array { return (at this 1) }
-method last Array { return (at this (count this)) }
-
 method indexOf Array obj startIndex {
   // Return the index of the first occurrence of the given object after
   // startIndex, or nil if not found. startIndex is optional.
@@ -110,10 +107,6 @@ method find Array target startIndex {
 
 // converting/combining
 
-method toList Array {
-  return (new 'List' 1 (count this) (copyArray this) )
-}
-
 method toArray Array { return this }
 
 method toBinaryData Array {
@@ -139,25 +132,6 @@ method toString Array limit visited {
   if (limit < (count this)) { s = (join s ' ...') }
   s = (join s ')')
   return s
-}
-
-method copy Array {
-  return (copyArray this)
-}
-
-method copyWith Array newEl {
-  result = (copyArray this ((count this) + 1))
-  atPut result (count result) newEl
-  return result
-}
-
-method copyWithout Array omitEl {
-  // Return a copy of this array without any instances of omitEl.
-  result = (list)
-  for el this {
-    if (omitEl != el) { add result el }
-  }
-  return (toArray result)
 }
 
 method copyFromTo Array start end {
@@ -472,9 +446,6 @@ method arrayShift Array shift {
 }
 
 // operations for indexable collections
-
-to isEmpty collection { return ((count collection) == 0) }
-to notEmpty collection { return ((count collection) > 0) }
 
 to atRandom collection { return (at collection (rand 1 (count collection))) }
 

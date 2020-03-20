@@ -291,7 +291,7 @@ method exportAsImage BlockDefinition {
   blockM = (ownerThatIsA morph 'Block')
   if (notNil blockM) { blockM = (owner blockM) } // get the prototype hat block
   if (or (isNil blockM) (not (isPrototypeHat (handler blockM)))) { return }
-  fName = (uniqueNameNotIn (listFiles (gpFolder)) 'scriptImage' '.png')
+  fName = (uniqueNameNotIn (listFiles (gpModFolder)) 'scriptImage' '.png')
   fName = (fileToWrite fName '.png')
   if ('' == fName) { return }
   if (not (endsWith fName '.png')) { fName = (join fName '.png') }
@@ -306,12 +306,13 @@ method exportAsImage BlockDefinition {
 method hideDefinition BlockDefinition {
   // Remove this method/function definition from the scripting area.
 
-  pe = (ownerThatIsA morph 'ProjectEditor')
+  pe = (findProjectEditor)
   if (isNil pe) { return }
-  scripter = (scripter (handler pe))
+  scripter = (scripter pe)
   targetClass = (targetClass scripter)
   if (isNil targetClass) { return } // shouldn't happen
 
+  saveScripts scripter
   newScripts = (list)
   for entry (scripts targetClass) {
 	cmd = (at entry 3)

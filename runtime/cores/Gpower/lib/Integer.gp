@@ -2,7 +2,7 @@
 
 // truncation and rounding
 
-method floor Integer { return this }
+
 method ceiling Integer { return this }
 method integerPart Integer { return this }
 method fractionPart Integer { return 0 }

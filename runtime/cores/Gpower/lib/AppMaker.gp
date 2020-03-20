@@ -11,7 +11,7 @@ defineClass AppMaker appName
 method exportApp AppMaker project name {
   if (isNil name) { name = 'MyApp' }
   dir = (directoryPart name)
-  if ('' == dir) { dir = (gpFolder) }
+  if ('' == dir) { dir = (gpModFolder) }
   name = (filePart name)
   embeddedFS = (createEmbeddedFS this project)
   if ('Mac' == (platform)) {
@@ -45,9 +45,6 @@ method createEmbeddedFS AppMaker project {
 	  if ('startup.gp' == fn) {
 		startup = (readEmbeddedFile fn)
 	  }
-	  if ('settings.json' == fn) {
-		settings = (readEmbeddedFile fn)
-	  }
 	}
 	for fn (listEmbeddedFiles) {
 	  if (beginsWith fn 'modules/') {
@@ -62,6 +59,22 @@ method createEmbeddedFS AppMaker project {
 	  prefix = (join prefix 'runtime/')
 	  if (isEmpty (listFiles (join prefix 'lib'))) {
 		error 'Could not find library folder'
+	  }
+	}
+	for fn (listFiles (join prefix 'cores/' (getCoreName) '/lib')){
+	  // Add the core libraries to the zipFile
+	  if (not (isOneOf fn '.DS_Store' '.' '..')) {
+	    fullName = (join 'cores/' (getCoreName) '/lib/' fn)
+		data = (readFile (join prefix fullName))
+		addFile zip (join 'lib/' fn) data true
+	  }
+	}
+	for fn (listFiles (join prefix 'cores/' (getCoreName))) {
+	  // Add the core files to the zipFile
+	  if (not (isOneOf fn '.DS_Store' '.' '..' 'startup.gp')) {
+	    fullName = (join 'cores/' (getCoreName) '/' fn)
+		data = (readFile (join prefix fullName))
+		addFile zip fullName data true
 	  }
 	}
 	for fn (listFiles (join prefix 'lib')) {
@@ -79,28 +92,31 @@ method createEmbeddedFS AppMaker project {
 	  }
 	}
 	startup = (readFile (join (directoryPart (appPath)) '/runtime/startup.gp'))
-	settings = (readFile (join (directoryPart (appPath)) '/runtime/settings.json'))
   }
   if (notNil project) {
-	// add startup.gp, settings.json and project file
+	// add startup.gp and project file
 	addFile zip 'startup.gp' (startupFile this) true
-	addFile zip 'settings.json' settings true
-	addFile zip 'project.gpp' (projectData2 project) true
+	if (notNil project) {
+	  addFile zip 'project.gpp' (projectData2 project) true
+	}
   } else {
 	addFile zip 'startup.gp' startup true
-	addFile zip 'settings.json' settings true
   }
   return zip
 }
 
 method startupFile AppMaker {
-  return '
+  return (join '
+to getCoreName {
+  return ''' (getCoreName) '''
+}
+
 to startup {
   setGlobal ''app'' true
   loadSettings
   openProjectEditor true false true true
 }
-'
+')
 }
 
 method executableWithData AppMaker data {

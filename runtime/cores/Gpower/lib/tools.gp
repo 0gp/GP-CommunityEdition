@@ -1,15 +1,6 @@
 // useful global functions
 
-// print and inspect
-
-to print args... {
-  result = (list)
-  for i (argCount) {
-    add result (toString (arg i))
-    if (i != (argCount)) {add result ' '}
-  }
-  log (joinStringArray (toArray result))
-}
+// Inspect
 
 to inspect obj {
   class = (classOf obj)
@@ -384,33 +375,6 @@ to fieldNameOrIndexFor srcObj referencedObj {
 to containsReferences obj {
   if (and (isClass obj 'Array') ((count obj) > 0)) { return true }
   return ((count (fieldNames (classOf obj))) > 0)
-}
-
-// tests
-
-to isNumber obj {
-  if (isClass obj 'Integer') { return true }
-  if (isClass obj 'Float') { return true }
-  if (isClass obj 'LargeInteger') { return true }
-  return false
-}
-
-to isAnyClass obj classNames... {
-  // Return true if obj is an instance of one of the given classes.
-
-  for i ((argCount) - 1) {
-    if (isClass obj (arg (i + 1))) { return true }
-  }
-  return false
-}
-
-to isOneOf obj items... {
-  // Return true if obj is equal to any of the remaining arguments.
-
-  for i ((argCount) - 1) {
-    if (obj == (arg (i + 1))) { return true }
-  }
-  return false
 }
 
 // runtime folder
