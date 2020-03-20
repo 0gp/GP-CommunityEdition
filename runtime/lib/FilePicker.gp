@@ -48,7 +48,7 @@ to pickFile anAction defaultPath extensionList saveFlag {
 
 // function to return the user's GP Mod folder
 
-to gpModFolder {
+to gpFolder {
   if ('iOS' == (platform)) { return '.' }
   path = (userHomePath)
 
@@ -129,7 +129,7 @@ method initialize FilePicker anAction defaultPath extensionList saveFlag {
 
   if forSaving {
 	defaultPath = (directoryPart defaultPath)
-	if (isEmpty defaultPath) { defaultPath = (gpModFolder) }
+	if (isEmpty defaultPath) { defaultPath = (gpFolder) }
 	if ('Browser' == (platform)) { defaultPath = 'Downloads' }
   }
   if (and ((count defaultPath) > 1) (endsWith defaultPath '/')) {
@@ -209,7 +209,7 @@ method addShortcutButtons FilePicker {
   hidden = (global 'hideFolderShortcuts')
   if (isNil hidden) { hidden = (array) }
 
-  showGPMod = (and
+  showGP = (and
 	(not (contains hidden 'GP Mod'))
 	('Browser' != (platform)))
   showExamples = (and
@@ -239,8 +239,8 @@ method addShortcutButtons FilePicker {
 	addIconButton this buttonX buttonY 'examplesIcon' (action 'setLibraries' this) 'Libraries'
 	buttonY += dy
   }
-  if showGPMod {
-	addIconButton this buttonX buttonY 'gpModFolderIcon' (action 'setGPModFolder' this) (filePart (gpModFolder))
+  if showGP {
+	addIconButton this buttonX buttonY 'gpFolderIcon' (action 'setGPFolder' this) (filePart (gpFolder))
 	buttonY += dy
   }
   if (not (isOneOf (platform) 'Browser' 'iOS')) {
@@ -355,9 +355,9 @@ method setLibraries FilePicker {
   showFolder this 'Libraries' true
 }
 
-method setGPModFolder FilePicker {
+method setGPFolder FilePicker {
   useEmbeddedFS = false
-  showFolder this (gpModFolder) true
+  showFolder this (gpFolder) true
 }
 
 method parentFolder FilePicker {
