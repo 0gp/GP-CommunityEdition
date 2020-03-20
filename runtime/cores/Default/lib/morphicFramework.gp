@@ -305,7 +305,10 @@ method processSwipe Hand xDelta yDelta {
 
 method processDown Hand button {
   currentObj = (currentObject this)
-  stopEditingUnfocusedText this currentObj
+  if (isNil (ownerThatIsA (morph currentObj) 'Menu')) {
+	// stop editing unless this is a menu selection (it could a text edit menu command)
+	stopEditingUnfocusedText this currentObj
+  }
   if (or (button == 3) (commandKeyDown (keyboard page))) {
     processRightClicked this currentObj
     return
@@ -660,10 +663,10 @@ method open Page tryRetina title {
   setGlobal 'scale' 1
   setGlobal 'flat' true
   setGlobal 'flatBlocks' false
+  if (isNil title) { title = 'GP Community Edition' }
   setGlobal 'stealthBlocks' false
   setGlobal 'stealthLevel' -50
   setClipping morph true
-  if (isNil title) { title = 'GP Mod - Based on GP Blocks' }
   openWindow (width morph) (height morph) tryRetina title
   winSize = (windowSize)
   setExtent morph (at winSize 3) (at winSize 4) // actual extent
@@ -787,7 +790,7 @@ method doOneCycle Page {
   step soundMixer
   // sleep for any extra time, but always sleep a little to ensure that
   // we get events (and to return control to the browser)
-  sleepTime = (max 1 (15 - (msecs t)))
+  sleepTime = (max 1 (10 - (msecs t)))
   waitMSecs sleepTime
 }
 
@@ -978,7 +981,7 @@ to inform msg { inform (global 'page') msg }
 
 method inform Page msg {
   m = (menu msg)
-  addItem m 'Ok' 'nop'
+  addItem m (localized 'Ok') 'nop'
   buildMorph m this (y hand)
   setGrabRule (morph m) 'handle'
   showMenu this m ((x hand) - (half (width (morph m)))) ((y hand) - (half (height (morph m))))
@@ -1029,10 +1032,9 @@ method prompt Page question default editRule callback {
   // to use in scripts
   if (isNil editRule) { editRule = 'line' }
   p = (new 'Prompter')
-  initialize p question default editRule callback
+  initialize p (localized question) (localized default) editRule callback
   fixLayout p
-  setCenter (morph p) (x hand) (y hand)
-  keepWithin (morph p) (bounds morph)
+  setPosition (morph p) (half ((width morph) - (width (morph p)))) (40 * (global 'scale'))
   addPart morph (morph p)
   edit (textBox p) hand
   selectAll (textBox p)
@@ -1048,8 +1050,7 @@ method confirm Page title question yesLabel noLabel callback {
   // see comment for ::prompt
   p = (new 'Prompter')
   initializeForConfirm p title question yesLabel noLabel callback
-  setCenter (morph p) (x hand) (y hand)
-  keepWithin (morph p) (insetBy (bounds morph) 50)
+  setPosition (morph p) (half ((width morph) - (width (morph p)))) (40 * (global 'scale'))
   addPart morph (morph p)
   if (isNil callback) {
     setField hand 'lastTouchTime' nil
@@ -1087,8 +1088,8 @@ method rightClicked Page {
 // context menu
 
 method contextMenu Page {
-  menu = (menu 'GP Mod' this)
-  addItem menu 'GP Mod version...' 'showGPModVersion'
+  menu = (menu 'GP' this)
+  addItem menu 'GP Mod version...' 'showGPVersion'
   addLine menu
   addItem menu 'show all' 'showAll' 'move any offscreen objects back into view'
   if (devMode) {
@@ -1119,7 +1120,7 @@ method contextMenu Page {
   return menu
 }
 
-method showGPModVersion Page {
+method showGPVersion Page {
   inform this (join 'GP Mod Version ' (libraryVersion) (newline) (at (version) 1))
 }
 

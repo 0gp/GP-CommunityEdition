@@ -27,7 +27,88 @@ to '!=' a b { return (not (a == b)) }
 // to '>' a b { return (and (not (a < b)) (not (a == b))) }
 // to '>=' a b { return (not (a < b))}
 
+// min, max, and sum
 
+to max args... {
+  // Return the maximum argument. Must have at least one argument.
+  // If the first argument is an array or list, return its maximum element.
+
+  if (and ((argCount) == 1) (isAnyClass (arg 1) 'Array' 'List')) {
+	return (callWith 'max' (toArray (arg 1)))
+  }
+  count = (argCount)
+  if (count == 0) { return nil }
+  result = (arg 1)
+  for i count {
+    n = (arg i)
+    if (n > result) { result = n }
+  }
+  return result
+}
+
+to min args... {
+  // Return the minimum argument. Must have at least one argument.
+  // If the first argument is an array or list, return its minimum element.
+
+  if (and ((argCount) == 1) (isAnyClass (arg 1) 'Array' 'List')) {
+	return (callWith 'min' (toArray (arg 1)))
+  }
+  count = (argCount)
+  if (count == 0) { return nil }
+  result = (arg 1)
+  for i count {
+    n = (arg i)
+    if (n < result) { result = n }
+  }
+  return result
+}
+
+to sum list {
+  result = 0.0
+  for n list { result += n }
+  return result
+}
+
+// clamp and range
+
+to clamp n min max {
+  // Return the closest value to n in the given range.
+  if (n < min) { n = min }
+  if (n > max) { n = max }
+  return n
+}
+
+to range start stop delta {
+  comment '
+	Return an array of integers over the given range (inclusive of start and stop).'
+
+  if (isNil delta) { delta = 1 }
+  if (isNil stop) {
+    stop = start
+	start = 1
+  }
+  if (delta == 0) { error 'Delta cannot be zero' }
+  delta = (abs delta)
+  result = (list start)
+  if (start < stop) {
+	steps = (floor ((stop - start) / delta))
+	for i steps {
+	  add result (start + (i * delta))
+	}
+  } else {
+	steps = (floor ((start - stop) / delta))
+	for i steps {
+	  add result (start - (i * delta))
+	}
+  }
+  return (toArray result)
+}
+
+to isBetween n start stop {
+  // Return true if n is between start and stop, inclusive.
+
+  return (and (start <= n) (n <= stop))
+}
 
 // misc operations
 

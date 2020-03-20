@@ -1,6 +1,6 @@
 // FilePicker.gp - Dialog box for specifying files for opening or saving.
 
-defineClass FilePicker morph window folderReadout listPane parentButton newFolderButton nameLabel nameField cancelButton okayButton topDir currentDir action forSaving extensions isDone answer
+defineClass FilePicker morph window folderReadout listPane parentButton newFolderButton nameLabel nameField cancelButton okayButton topDir currentDir useEmbeddedFS action forSaving extensions isDone answer
 
 to pickFileToOpen anAction defaultPath extensionList {
   // Pick an existing file to open starting at defaultPath, if provided. If anAction is not
@@ -29,6 +29,9 @@ to fileToWrite defaultPath extensionList {
 to pickFile anAction defaultPath extensionList saveFlag {
   if (isNil saveFlag) { saveFlag = false }
   page = (global 'page')
+  if (and (notNil defaultPath) (beginsWith defaultPath '//')) {
+	defaultPath = ''
+  }
   picker = (initialize (new 'FilePicker') anAction defaultPath extensionList saveFlag)
   addPart page picker
   pickerM = (morph picker)
@@ -66,6 +69,10 @@ to gpModFolder {
   return path
 }
 
+to gpExamplesFolder {
+  return (join (absolutePath '.') '/Examples')
+}
+
 // support for synchronous ("modal") calls
 
 method destroyedMorph FilePicker { isDone = true }
@@ -78,6 +85,7 @@ method initialize FilePicker anAction defaultPath extensionList saveFlag {
   if (isNil defaultPath) { defaultPath = (absolutePath '.') }
   if (isNil saveFlag) { saveFlag = false }
   scale = (global 'scale')
+  useEmbeddedFS = false
 
   forSaving = saveFlag
   if forSaving {
@@ -100,6 +108,12 @@ method initialize FilePicker anAction defaultPath extensionList saveFlag {
   lbox = (listBox (array) nil (action 'fileOrFolderSelected' this) clr)
   onDoubleClick lbox (action 'fileOrFolderDoubleClicked' this)
   setFont lbox 'Arial' 16
+  if ('Linux' == (platform)) {
+	setFont lbox 'Liberation Sans' (12 * scale)
+  }
+  if ('Browser' == (platform)) {
+	setFont lbox 'Arial' (16 * scale)
+  }
   listPane = (scrollFrame lbox clr)
   addPart morph (morph listPane)
   setGrabRule (morph listPane) 'ignore'
@@ -121,6 +135,10 @@ method initialize FilePicker anAction defaultPath extensionList saveFlag {
   if (and ((count defaultPath) > 1) (endsWith defaultPath '/')) {
 	defaultPath = (substring defaultPath 1 ((count defaultPath) - 1))
   }
+  if (isOneOf defaultPath 'Examples' 'Libraries') {
+	useEmbeddedFS = true
+	if ('Browser' == (platform)) { useEmbeddedFS = false }
+  }
   showFolder this defaultPath true
   return this
 }
@@ -129,9 +147,19 @@ method addFolderReadoutAndParentButton FilePicker {
   scale = (global 'scale')
   x = (110 * scale)
   y = (32 * scale)
+  fontName = 'Arial Bold'
+  fontSize = (16 * scale)
+  if ('Linux' == (platform)) {
+	fontName = 'Liberation Sans Bold'
+	fontSize = (12 * scale)
+  }
+  if ('Browser' == (platform)) {
+	fontName = 'Arial'
+	fontSize = (16 * scale)
+  }
 
   folderReadout = (newText 'Folder Readout')
-  setFont folderReadout 'Arial Bold' (16 * scale)
+  setFont folderReadout fontName fontSize
   setGrabRule (morph folderReadout) 'ignore'
   setPosition (morph folderReadout) x y
   addPart morph (morph folderReadout)
@@ -147,17 +175,27 @@ method addFileNameField FilePicker defaultName {
   scale = (global 'scale')
   x = (110 * scale)
   y = (32 * scale)
+  fontName = 'Arial Bold'
+  fontSize = (15 * scale)
+  if ('Linux' == (platform)) {
+	fontName = 'Liberation Sans'
+	fontSize = (12 * scale)
+  }
+  if ('Browser' == (platform)) {
+	fontName = 'Arial'
+	fontSize = (15 * scale)
+  }
 
   // name label
   nameLabel = (newText 'File name:')
-  setFont nameLabel 'Arial Bold' (15 * scale)
+  setFont nameLabel (join fontName ' Bold') fontSize
   setGrabRule (morph nameLabel) 'ignore'
   addPart morph (morph nameLabel)
 
   // name field
   border = (2 * scale)
   nameField = (newText defaultName)
-  setFont nameField 'Arial' (15 * scale)
+  setFont nameField fontName fontSize
   setBorders nameField border border true
   setEditRule nameField 'line'
   setGrabRule (morph nameField) 'ignore'
@@ -171,20 +209,38 @@ method addShortcutButtons FilePicker {
   hidden = (global 'hideFolderShortcuts')
   if (isNil hidden) { hidden = (array) }
 
-  showGPMod = (and
+  showGP = (and
 	(not (contains hidden 'GP Mod'))
 	('Browser' != (platform)))
+  showExamples = (and
+	(not (contains hidden 'Examples'))
+	(not forSaving)
+	(isClass extensions 'Array')
+	(contains extensions '.gpp'))
+  showLibraries = (and
+	(not (contains hidden 'Libraries'))
+	(not forSaving)
+	(isClass extensions 'Array')
+	(contains extensions '.ulib'))
   showDesktop = (not (contains hidden 'Desktop'))
   showDownloads = (and
 	(not (contains hidden 'Downloads'))
 	('Linux' != (platform)))
-  showcComputer = (not (contains hidden 'Computer'))
+  showComputer = (not (contains hidden 'Computer'))
 
-  buttonX = ((left morph) + (22 * scale))
+  buttonX = ((left morph) + (17 * scale))
   buttonY = ((top morph) + (55 * scale))
   dy = (60 * scale)
-  if showGPMod {
-	addIconButton this buttonX buttonY 'gpModFolderIcon' (action 'setGPModFolder' this) 'GP Mod'
+  if showExamples {
+	addIconButton this buttonX buttonY 'examplesIcon' (action 'setExamples' this)
+	buttonY += dy
+  }
+  if showLibraries {
+	addIconButton this buttonX buttonY 'examplesIcon' (action 'setLibraries' this) 'Libraries'
+	buttonY += dy
+  }
+  if showGP {
+	addIconButton this buttonX buttonY 'gpModFolderIcon' (action 'setgpModFolder' this) (filePart (gpModFolder))
 	buttonY += dy
   }
   if (not (isOneOf (platform) 'Browser' 'iOS')) {
@@ -196,11 +252,16 @@ method addShortcutButtons FilePicker {
 	  addIconButton this buttonX buttonY 'downloadsIcon' (action 'setDownloads' this)
 	  buttonY += dy
 	}
-	if showcComputer {
+	if showComputer {
 	  addIconButton this buttonX buttonY 'computerIcon' (action 'setComputer' this)
 	  buttonY += dy
 	}
   }
+  if (and showComputer ('Browser' == (platform)) (browserIsChromebook)) {
+	addIconButton this buttonX buttonY 'computerIcon' (action 'setComputer' this)
+	buttonY += dy
+  }
+
   newFolderButton = (textButton this (buttonX + (2 * scale)) buttonY 'New Folder' 'newFolder')
 }
 
@@ -213,9 +274,17 @@ method addIconButton FilePicker x y iconName anAction label {
   }
   scale = (global 'scale')
   iconBM = (scaleAndRotate (call iconName (new 'FilePickerIcons')) (0.75 * scale))
-  bm = (newBitmap (62 * scale) (40 * scale))
+//  iconBM = (scaledIcon this iconName) // don't activate this until warpBitmap works in browsers
+  bm = (newBitmap (70 * scale) (40 * scale))
   drawBitmap bm iconBM (half ((width bm) - (width iconBM))) 0
-  setFont 'Arial Bold' (12 * scale)
+  if (1 == scale) {
+	setFont 'Arial Bold' (9 * scale)
+  } else {
+	setFont 'Arial Bold' (12 * scale)
+  }
+  if ('Browser' == (platform)) {
+	setFont 'Helvetica' (13 * scale)
+  }
   labelX = (half ((width bm) - (stringWidth label)))
   labelY = ((height bm) - (fontHeight))
   drawString bm label (gray 0) labelX labelY
@@ -225,6 +294,16 @@ method addIconButton FilePicker x y iconName anAction label {
   setPosition (morph button) x y
   addPart morph (morph button)
   return button
+}
+
+method scaledIcon FilePicker iconName {
+	// This works on SDL 2.0.10 but warpBitmap has not yet been implemented for browsers.
+	scaleFactor = (0.8 * (global 'scale'))
+	iconBM = (call iconName (new 'FilePickerIcons'))
+	resultBM = (newBitmap (scaleFactor * (width iconBM)) (scaleFactor * (height iconBM)))
+	// warpBitmap args: dstBM srcBM xScale yScale rotation
+	warpBitmap resultBM iconBM 0 0 scaleFactor scaleFactor
+	return resultBM
 }
 
 method textButton FilePicker x y label selectorOrAction {
@@ -240,18 +319,44 @@ method textButton FilePicker x y label selectorOrAction {
 // actions
 
 method setComputer FilePicker {
+  if (and ('Browser' == (platform)) (browserIsChromebook)) {
+	isDone = true
+	removeFromOwner morph
+	repeat 3 { // hack: need several cycles to remove FilePicker when file is double-clicked
+		doOneCycle (global 'page')
+		waitMSecs 10 // refresh screen
+	}
+	chromeReadFile
+	return
+  }
+  useEmbeddedFS = false
   showFolder this '/' true
 }
 
 method setDesktop FilePicker {
+  useEmbeddedFS = false
   showFolder this (join (userHomePath) '/Desktop') true
 }
 
 method setDownloads FilePicker {
+  useEmbeddedFS = false
   showFolder this (join (userHomePath) '/Downloads') true
 }
 
-method setGPModFolder FilePicker {
+method setExamples FilePicker {
+  useEmbeddedFS = true
+  if ('Browser' == (platform)) { useEmbeddedFS = false }
+  showFolder this 'Examples' true
+}
+
+method setLibraries FilePicker {
+  useEmbeddedFS = true
+  if ('Browser' == (platform)) { useEmbeddedFS = false }
+  showFolder this 'Libraries' true
+}
+
+method setgpModFolder FilePicker {
+  useEmbeddedFS = false
   showFolder this (gpModFolder) true
 }
 
@@ -266,21 +371,56 @@ method showFolder FilePicker path isTop {
   currentDir = path
   if isTop { topDir = path }
   setText folderReadout (filePart path)
-  newContents = (list)
-  for dir (sorted (listDirectories currentDir)) {
+  updateParentAndNewFolderButtons this
+  setCollection (contents listPane) (folderContents this)
+}
+
+method folderContents FilePicker {
+  result = (list)
+  if useEmbeddedFS {
+	dirsAndFiles = (embeddedFilesAndDirs this (join currentDir '/'))
+	dirList = (at dirsAndFiles 1)
+	fileList = (at dirsAndFiles 2)
+  } else {
+	dirList = (listDirectories currentDir)
+	fileList = (listFiles currentDir)
+  }
+  for dir (sorted dirList 'caseInsensitiveSort') {
 	if (not (beginsWith dir '.')) {
-	  add newContents (join '[ ] ' dir)
+	  add result (join '[ ] ' dir)
 	}
   }
-  for fn (sorted (listFiles currentDir)) {
+  for fn (sorted fileList 'caseInsensitiveSort') {
 	if (not (beginsWith fn '.')) {
 	  if (or (isNil extensions) (hasExtension fn extensions)) {
-		add newContents fn
+		add result fn
 	  }
 	}
   }
-  updateParentAndNewFolderButtons this
-  setCollection (contents listPane) newContents
+  return result
+}
+
+method embeddedFilesAndDirs FilePicker prefix {
+  dirsSeen = (dictionary)
+  dirList = (list)
+  fileList = (list)
+  offset = ((count prefix) + 1)
+  for fn (listEmbeddedFiles) {
+	if (beginsWith fn prefix) {
+	  fn = (substring fn offset)
+	  i = (findFirst fn '/')
+	  if (isNil i) {
+		add fileList fn
+	  } else {
+		dirName = (substring fn 1 (i - 1))
+		if (not (contains dirsSeen dirName)) {
+		  add dirList dirName
+		  add dirsSeen dirName
+		}
+	  }
+	}
+  }
+  return (list dirList fileList)
 }
 
 method newFolder FilePicker {
@@ -291,6 +431,7 @@ method newFolder FilePicker {
   }
   newPath = (join currentDir '/' newFolderName)
   makeDirectory newPath
+  useEmbeddedFS = false
   showFolder this newPath false
 }
 
@@ -304,6 +445,7 @@ method okay FilePicker {
 	  answer = (join currentDir '/' sel)
 	}
   }
+  if (and useEmbeddedFS ('' != answer)) { answer = (join '//' answer) }
   if (and (notNil action) ('' != answer)) { call action answer }
   isDone = true
   removeFromOwner morph
@@ -313,11 +455,18 @@ method fileOrFolderSelected FilePicker {
   sel = (selection (contents listPane))
   if (beginsWith sel '[ ] ') {
 	sel = (substring sel 5)
-	if (or (endsWith sel ':')) {
+	if (endsWith sel ':') {
 	  showFolder this sel true
+	} ('/' == currentDir) {
+	  showFolder this (join currentDir sel) false
 	} else {
 	  showFolder this (join currentDir '/' sel) false
 	}
+  } else {
+    // fill the file name input field with the name of the selected file
+    if (notNil nameField) {
+      setText (contents nameField) sel
+    }
   }
 }
 
@@ -332,7 +481,9 @@ method fileOrFolderDoubleClicked FilePicker {
 	}
   } else { // file selected
 	if (not forSaving) {
-	  if (notNil action) { call action (join currentDir '/' sel) }
+	  answer = (join currentDir '/' sel)
+	  if useEmbeddedFS { answer = (join '//' answer) }
+	  if (notNil action) { call action answer }
 	  removeFromOwner morph
 	}
   }
@@ -510,6 +661,42 @@ EXOhy067usJqu8xrS4t4qairQu5BvacZToEFpDilKNnSlf+B3V/8bnCz3vrJuNV+KpihrEKAGGrMW9JK
 gEopCoUJS0uvUSGUEqhFyNEZhLU5kEKBAlkiVRBCZbQrHU5ECngMxGHlbmsEAjB/73fuB74JjPjf6TfH
 n/jxz+RyIa4Hrgc2AvF9XtiAS8BFYElYc6Fm7euby0DvpxxIQHv5+MHqX/OFuc65fm3hAAAAAElFTkSu
 QmCC'
+  return (readFrom (new 'PNGReader') (base64Decode data))
+}
+
+method examplesIcon FilePickerIcons {
+  data = '
+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
+jvGZAAAAAElFTkSuQmCC'
   return (readFrom (new 'PNGReader') (base64Decode data))
 }
 

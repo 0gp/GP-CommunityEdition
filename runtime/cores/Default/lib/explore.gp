@@ -323,6 +323,7 @@ method browseClass Explorer aClass {
 
 // readouts
 
+to fieldInfo fieldName {return nil}
 
 method selectedValue Explorer {
   if (isNil (selection listBox)) {return nil}

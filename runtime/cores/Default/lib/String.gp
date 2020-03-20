@@ -56,6 +56,13 @@ method isDigit String {
   return (and ('0' <= this) (this <= '9'))
 }
 
+method isHexDigit String {
+  return (or
+  	(and ('0' <= this) (this <= '9'))
+  	(and ('A' <= this) (this <= 'F'))
+  	(and ('a' <= this) (this <= 'f')))
+}
+
 method isSymbol String {
   // Return true if this character is an ASCII symbol
   return (or (and ('!' <= this) (this <= '/'))
@@ -75,6 +82,24 @@ method containsWhitespace String {
 	if ((byteAt this i) <= space) { return true }
   }
   return false
+}
+
+// Sorting
+
+method caseInsensitiveSort String aString {
+  // Return true if this string would come before aString in a case-insensitive ASCII sort.
+  // NOTE: Does not sort Unicode characters correctly!
+
+  count = (min (count this) (count aString))
+  for i count {
+	ch1 = (at this i)
+	ch2 = (at aString i)
+	if (isLowerCase ch1) { ch1 = (string ((byteAt ch1 1) - 32)) }
+	if (isLowerCase ch2) { ch2 = (string ((byteAt ch2 1) - 32)) }
+	if (ch1 < ch2) { return  true }
+	if (ch1 > ch2) { return  false }
+  }
+  return (count this) <= (count aString)
 }
 
 // Splitting file paths
@@ -619,13 +644,53 @@ method canonicalizedWord String {
   return (joinStringArray (toArray result))
 }
 
-method urlEncode String {
+method urlDecode String {
+  result = (list)
+  letters = (letters this)
+  n = (count letters)
+  i = 1
+  while (i <= n) {
+	ch = (at letters i)
+	if (and
+	  ('%' == ch)
+	  (i <= (n - 2))
+	  (isHexDigit (at letters (i + 1)))
+	  (isHexDigit (at letters (i + 2)))) {
+		hexDigits = (join (at letters (i + 1)) (at letters (i + 2)))
+		add result (hex hexDigits)
+		i += 3
+	} else {
+		addAll result (toArray (toBinaryData ch))
+		i += 1
+	}
+  }
+  return (toString (toBinaryData (toArray result)))
+}
+
+method percentEncode String {
+  return (urlEncode this true)
+}
+
+method urlEncode String safeOnly {
+  safe = (toArray (toBinaryData '-_.~'))
+  // Note: could add some of these: '$''()*,' to reserved but it seems best to escape them
+  reserved = (toArray (toBinaryData '!#&+/:;=?@'))
+  if (true == safeOnly) { reserved = (array) } // percent encode reserved characters
   result = (list)
   for ch (toArray (toBinaryData this)) {
-	if (and (32 < ch) (ch < 127)) {
-	   add result (string ch)
+	if (or
+		(and (97 <= ch) (ch <= 122)) // a-z
+		(and (65 <= ch) (ch <= 90)) // A-Z
+		(and (48 <= ch) (ch <= 57)) // 0-9
+		(contains safe ch)
+		(contains reserved ch)) {
+			// ch does not need to be encoded
+			add result (string ch)
 	} else {
-	  add result (join '%' (toStringBase16 ch))
+			// ch must be percent-encoded (this includes the bytes of utf-8 encoded characters
+			hexDigits = (toStringBase16 ch)
+			if ((count hexDigits) < 2) { hexDigits = (join '0' hexDigits) }
+			add result (join '%' hexDigits)
 	}
   }
   return (joinStringArray (toArray result))
@@ -668,6 +733,21 @@ method representsANumber String {
 	  return false
 	}
 	lastC = c
+  }
+  return true
+}
+
+method representsAnInteger String {
+  if ('' == this) { return false }
+  if ('-' == (at this 1)) {
+  	return (and ((count this) > 1) (allDigits (substring this 2)))
+  }
+  return (allDigits this)
+}
+
+method allDigits String {
+  for c (letters this) {
+	if (not (isDigit c)) { return false }
   }
   return true
 }

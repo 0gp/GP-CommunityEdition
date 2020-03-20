@@ -1,7 +1,7 @@
 // Button.gp - Simple button
 // addPart (global 'page') (morph (newButton)) xxx
 
-defineClass Button morph clickAction offCostume onCostume isOn
+defineClass Button morph clickAction offCostume onCostume isOn hint
 
 to newButton label action {
   return (initialize (new 'Button') label action)
@@ -20,6 +20,9 @@ method initialize Button label action {
 method toggle Button { setOn this (not isOn) }
 method isOn Button { return isOn }
 
+method setHint Button aStringOrNil { hint = aStringOrNil }
+method hint Button { return hint }
+
 method setOn Button bool {
   isOn = (true == bool)
   if (and isOn (notNil onCostume)) {
@@ -30,8 +33,8 @@ method setOn Button bool {
 }
 
 method setLabel Button label offColor onColor minWidth minHeight fontName fontSize fontColor {
-  if (isNil offColor) { offColor = (gray 120) }
-  if (isNil onColor) { onColor = (lighter offColor 50) }
+  if (isNil offColor) { offColor = (gray 150) }
+  if (isNil onColor) { onColor = (lighter offColor 15) }
   offBM = (makeCostume this label offColor minWidth minHeight fontName fontSize fontColor)
   onBM = (makeCostume this label onColor minWidth minHeight fontName fontSize fontColor)
   setCostumes this offBM onBM
@@ -53,7 +56,7 @@ method makeCostume Button label color minWidth minHeight fontName fontSize fontC
   if (isNil minWidth) { minWidth = 10 }
   if (isNil minHeight) { minHeight = 10 }
   if (isNil fontName) { fontName = 'Arial Bold' }
-  if (isNil fontSize) { fontSize = (scale * 11) }
+  if (isNil fontSize) { fontSize = (scale * 13) }
   if (isNil fontColor) { fontColor = (gray 255) }
 
   borderColor = (gray 80)
@@ -92,8 +95,13 @@ method handEnter Button aHand {
   if (notNil onCostume) {
 	setCostume morph onCostume
   }
+  if (notNil hint) {
+	addSchedule (global 'page') (schedule (action 'showHint' morph hint) 800)
+  }
 }
 
 method handLeave Button aHand {
   setOn this isOn
+  if (notNil hint) {removeHint (page aHand)}
+  removeSchedulesFor (global 'page') 'showHint' morph
 }

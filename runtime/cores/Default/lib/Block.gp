@@ -39,7 +39,7 @@ to block type color opName {
   }
   argValues = (list op)
   for each group {
-    if (isAnyClass each 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot') {add argValues (contents each)}
+    if (isAnyClass each 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'MicroBitDisplaySlot') {add argValues (contents each)}
   }
   block = (new 'Block')
   setField block 'type' type
@@ -402,7 +402,7 @@ method inputIndex Block anInput {
   }
 
   for each items {
-    if (isAnyClass each 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'Block') {
+    if (isAnyClass each 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'Block' 'MicroBitDisplaySlot') {
       idx += 1
       if (each === anInput) {return idx}
     }
@@ -413,7 +413,7 @@ method inputIndex Block anInput {
 method inputs Block {
   // disregard variable accessing
   return (filter
-    (function each {return (isAnyClass each 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'Block')})
+    (function each {return (isAnyClass each 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'Block' 'MicroBitDisplaySlot')})
     (flattened labelParts)
   )
 }
@@ -891,12 +891,12 @@ method exportAsImage Block {
   if ('' == fName) { return }
   if (not (endsWith fName '.png')) { fName = (join fName '.png') }
   gc
-  pixelsPerInch = 288
+  pixelsPerInch = 144
   scaledScript = (scaledScript this (pixelsPerInch / 72))
   bnds = (fullBounds (morph scaledScript))
   bm = (newBitmap (width bnds) (height bnds))
   draw2 (morph scaledScript) bm (- (left bnds)) (- (top bnds))
-  writeFile fName (encodePNG bm 288)
+  writeFile fName (encodePNG bm pixelsPerInch)
 }
 
 method scaledScript Block scriptScale {
@@ -993,7 +993,7 @@ method openClassBrowser Block className {
   if (notNil editor) {
 	cl = (classNamed (module (project (handler editor))) className)
   }
-  if (isNil cl) { cl =  className }
+  if (isNil cl) { cl = (class className) }
   browseClass cl (primName expression)
 }
 
@@ -1189,8 +1189,12 @@ to toBlock commandOrReporter silently {
 method labelText Block aString {
   fontName =  'Verdana Bold'
   fontSize = (11 * scale)
-  if (isOneOf aString '+' '-' '*' '/' '×' '−') {  // the last two are unicode multiple and minus
+  if (isOneOf aString '+' '-' '*' '/' 'Ã—' 'âˆ’') {  // the last two are unicode multiple and minus
   	fontSize = (12 * scale)
+  }
+  if ('Linux' == (platform)) {
+	fontName =  'Sans Bold'
+	fontSize = (round (0.92 * fontSize))
   }
   if (global 'stealthBlocks') {
     labelColor = (gray (stealthLevel 255 0))
@@ -1306,7 +1310,7 @@ method initializeForNode Block commandOrReporter silently {
         replaceInput this slot (toBlock each) false
       }
     } else {
-      if (isAnyClass slot 'InputSlot' 'BooleanSlot' 'ColorSlot') {
+      if (isAnyClass slot 'InputSlot' 'BooleanSlot' 'ColorSlot' 'MicroBitDisplaySlot') {
         setContents slot each
       } (and (isClass slot 'Block') (isRenamableVar slot)) {
         renameVariableTo slot each
@@ -1432,6 +1436,11 @@ method initializeForSpec Block spec suppressExpansion silently {
   labelParts = (list group)
   addAllLabelParts this silently
 
+  // hack: make the font bigger in comment blocks
+  if ('comment' == (blockOp spec)) {
+	setFont (getField (last (first labelParts)) 'text') nil (13 * scale)
+  }
+
   // expand to the first input slot, if any
   if suppressExpansion {return}
   if (and (repeatLastSpec blockSpec) (== 0 (countInputSlots blockSpec (at (specs blockSpec) 1)))) {
@@ -1555,7 +1564,7 @@ method addAllLabelParts Block silently {
   // create a new expression with the matching number of empty argument slots
   cmdAndArgs = (list (blockOp blockSpec))
   for p allParts {
-    if (isAnyClass p 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'Block') {
+    if (isAnyClass p 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'Block' 'MicroBitDisplaySlot') {
       add cmdAndArgs nil
     }
   }
@@ -1572,7 +1581,7 @@ method addAllLabelParts Block silently {
   // in something different)
   if (not (isPrototype this)) {
     for p allParts {
-      if (isAnyClass p 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'Block') {
+      if (isAnyClass p 'InputSlot' 'BooleanSlot' 'ColorSlot' 'CommandSlot' 'Block' 'MicroBitDisplaySlot') {
         inputChanged this p
       }
     }
