@@ -151,18 +151,27 @@ to logBase n base {
   return ((ln n) / (ln base))
 }
 
-to raise base n {
-  if (-1 == base) { // special case
-	if (and (n == (truncate n)) (n > 0)) {
-	  if (0 == (n % 2)) {
-		return 1
-	  } else {
-	    return -1
-	  }
-	}
-  }
-  if (base <= 0) { error 'The first argument of raise (the base) must be greater than zero' }
-  return (exp (n * (ln base)))
+//to raise base n {
+//  if (-1 == base) { // special case
+//	if (and (n == (truncate n)) (n > 0)) {
+//	  if (0 == (n % 2)) {
+//		return 1
+//	  } else {
+//	    return -1
+//	  }
+//	}
+//  }
+//  if (base <= 0) { error 'The first argument of raise (the base) must be greater than zero' }
+//  return (exp (n * (ln base)))
+  
+  if (base == 0) {
+  return 0
+}
+if ((n % 2) == 0) {
+  return (exp (n * (ln (abs base))))
+} else {
+  return (negate (exp (n * (ln (abs base)))))
+}
 }
 
 // hexadecimal numbers
