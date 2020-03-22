@@ -151,7 +151,7 @@ to logBase n base {
   return ((ln n) / (ln base))
 }
 
-//to raise base n {
+to raise base n {
 //  if (-1 == base) { // special case
 //	if (and (n == (truncate n)) (n > 0)) {
 //	  if (0 == (n % 2)) {
