@@ -1089,7 +1089,7 @@ method rightClicked Page {
 
 method contextMenu Page {
   menu = (menu 'GP' this)
-  addItem menu 'GP Mod version...' 'showModGPVersion'
+  addItem menu 'GP Mod version...' 'showGPModVersion'
   addLine menu
   addItem menu 'show all' 'showAll' 'move any offscreen objects back into view'
   if (devMode) {
@@ -1120,7 +1120,7 @@ method contextMenu Page {
   return menu
 }
 
-method showModGPVersion Page {
+method showGPModVersion Page {
   inform this (join 'GP Mod Version ' (libraryVersion) (newline) (at (version) 1))
 }
 

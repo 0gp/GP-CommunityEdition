@@ -152,17 +152,15 @@ to logBase n base {
 }
 
 to raise base n {
-  if (-1 == base) { // special case
-	if (and (n == (truncate n)) (n > 0)) {
-	  if (0 == (n % 2)) {
-		return 1
-	  } else {
-	    return -1
-	  }
-	}
-  }
-  if (base <= 0) { error 'The first argument of raise (the base) must be greater than zero' }
-  return (exp (n * (ln base)))
+if (base == 0) {
+  return 0
+}
+if (base > 0) {
+  return (exp (n * (ln (abs base))))
+} (not ((n % 2) == 0)) {
+  return (negate (exp (n * (ln (abs base)))))
+}
+error 'Please input a number...'
 }
 
 // hexadecimal numbers

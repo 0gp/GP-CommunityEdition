@@ -173,7 +173,7 @@ method readEscapedChar JSONReader {
   } ('t' == ch) {
 	return (string 9)
   } ('u' == ch) {
-	return (hex (next this 4))
+	return (stringFromCodePoints (array (hex (next this 4))))
   } else {
 	return ch // handles back slash, forward slash (solidus), double-quote
   }
@@ -328,12 +328,11 @@ method needsEscapes JSONWriter letters {
 method escape JSONWriter letters {
   result = (list)
   for ch letters {
+	ascii = (byteAt ch 1)
 	if (or (ch == '"') (ch == '\')) {
 	  add result '\'
 	  add result ch
-	}
-	ascii = (byteAt ch 1)
-	if (ascii < 32) {
+	} (ascii < 32) {
 	  add result '\'
 	  if (8 == ascii) {
 		add result 'b'
@@ -353,6 +352,8 @@ method escape JSONWriter letters {
 		add result 'u'
 		add result hex
 	  }
+	} else {
+		add result ch
 	}
   }
   return (joinStrings result)
