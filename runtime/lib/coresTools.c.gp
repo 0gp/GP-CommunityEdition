@@ -33,6 +33,9 @@ to writeCoreFile fn data {
   writeFile (joinStringArray (array 'runtime/cores/' (getCoreName) '/' fn)) data
 }
 
+to coreLoaderVersion {
+  return '0.001'   
+}
 // --- Integer.gp ---
 
 method floor Integer { return this }
