@@ -11,7 +11,7 @@ defineClass AppMaker appName
 method exportApp AppMaker project name {
   if (isNil name) { name = 'MyApp' }
   dir = (directoryPart name)
-  if ('' == dir) { dir = (gpFolder) }
+  if ('' == dir) { dir = (gpModFolder) }
   name = (filePart name)
   embeddedFS = (createEmbeddedFS this project)
   if ('Mac' == (platform)) {

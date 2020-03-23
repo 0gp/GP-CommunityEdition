@@ -468,7 +468,7 @@ method scriptChanged ScriptEditor {
 // saving script image
 
 method saveScriptsImage ScriptEditor {
-  fName = (uniqueNameNotIn (listFiles (gpFolder)) 'scriptsImage' '.png')
+  fName = (uniqueNameNotIn (listFiles (gpModFolder)) 'scriptsImage' '.png')
   fName = (fileToWrite fName '.png')
   if ('' == fName) { return }
   if (not (endsWith fName '.png')) { fName = (join fName '.png') }

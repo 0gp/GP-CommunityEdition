@@ -810,7 +810,7 @@ method exportClass Scripter aClass {
 }
 
 method importClass Scripter {
-  pickFileToOpen (action 'importClassFromFile' this) (gpFolder) '.gp'
+  pickFileToOpen (action 'importClassFromFile' this) (gpModFolder) '.gp'
 }
 
 method importClassFromFile Scripter fileName {

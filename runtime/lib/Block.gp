@@ -886,7 +886,7 @@ method copyToClipboard Block {
 }
 
 method exportAsImage Block {
-  fName = (uniqueNameNotIn (listFiles (gpFolder)) 'scriptImage' '.png')
+  fName = (uniqueNameNotIn (listFiles (gpModFolder)) 'scriptImage' '.png')
   fName = (fileToWrite fName '.png')
   if ('' == fName) { return }
   if (not (endsWith fName '.png')) { fName = (join fName '.png') }

@@ -48,7 +48,7 @@ to pickFile anAction defaultPath extensionList saveFlag {
 
 // function to return the user's GP Mod folder
 
-to gpFolder {
+to gpModFolder {
   if ('iOS' == (platform)) { return '.' }
   path = (userHomePath)
 
@@ -129,7 +129,7 @@ method initialize FilePicker anAction defaultPath extensionList saveFlag {
 
   if forSaving {
 	defaultPath = (directoryPart defaultPath)
-	if (isEmpty defaultPath) { defaultPath = (gpFolder) }
+	if (isEmpty defaultPath) { defaultPath = (gpModFolder) }
 	if ('Browser' == (platform)) { defaultPath = 'Downloads' }
   }
   if (and ((count defaultPath) > 1) (endsWith defaultPath '/')) {
@@ -240,7 +240,7 @@ method addShortcutButtons FilePicker {
 	buttonY += dy
   }
   if showGP {
-	addIconButton this buttonX buttonY 'gpFolderIcon' (action 'setGPFolder' this) (filePart (gpFolder))
+	addIconButton this buttonX buttonY 'gpModFolderIcon' (action 'setGPModFolder' this) (filePart (gpModFolder))
 	buttonY += dy
   }
   if (not (isOneOf (platform) 'Browser' 'iOS')) {
@@ -355,9 +355,9 @@ method setLibraries FilePicker {
   showFolder this 'Libraries' true
 }
 
-method setGPFolder FilePicker {
+method setGPModFolder FilePicker {
   useEmbeddedFS = false
-  showFolder this (gpFolder) true
+  showFolder this (gpModFolder) true
 }
 
 method parentFolder FilePicker {
@@ -700,7 +700,7 @@ jvGZAAAAAElFTkSuQmCC'
   return (readFrom (new 'PNGReader') (base64Decode data))
 }
 
-method gpFolderIcon FilePickerIcons {
+method gpModFolderIcon FilePickerIcons {
   data = '
 iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAGeUlEQVR4nO2W28umVRnGf/e91nreb+ZT
 ZyMlbsZtGyEdEwqCbEMH0saUDPTAjoLoLwgi25BBBJ11Fh11IFGgWRCFB4kRHnnQ2ZibHCgRsnBmvvne
