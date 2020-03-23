@@ -127,8 +127,8 @@ to interpolate n1 n2 fraction {
 
 // angles and vectors
 
-to toRadians n { return ((n * (pi)) / 180) }
-to toDegrees n { return ((n * 180) / (pi)) }
+to toRadians n { return (n * 0.0174533) }
+to toDegrees n { return (n * 57.2958) }
 
 to distanceFromTo x1 y1 x2 y2 {
   dx = (x2 - x1)
@@ -152,15 +152,15 @@ to logBase n base {
 }
 
 to raise base n {
-if (base == 0) {
-  return 0
-}
-if (base > 0) {
-  return (exp (n * (ln (abs base))))
-} (not ((n % 2) == 0)) {
-  return (negate (exp (n * (ln (abs base)))))
-}
-error 'Please input a number...'
+	if (base == 0) {
+	return 0
+	}
+	if (base > 0) {
+		return (exp (n * (ln (abs base))))
+	} (not ((n % 2) == 0)) {
+		return (negate (exp (n * (ln (abs base)))))
+	}
+	error 'Error'
 }
 
 // hexadecimal numbers
