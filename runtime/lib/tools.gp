@@ -634,6 +634,35 @@ to tinyBenchmarks {
   return (joinStrings result (newline))
 }
 
+to easyBench timeGoal cmd {
+  // Will Call multiple times the given command to give an approximation of the 
+  local 'function' (function cmd)
+  local 'executions' 0.1
+  local 'timerMem' 0
+  while (timerMem < 50) {
+    executions = (truncate (10 * executions))
+    timerMem = (msecsSinceStart)
+    repeat executions {
+      call function
+    }
+    timerMem = ((msecsSinceStart) - timerMem)
+  }
+  if ((timerMem / 1000) >= timeGoal) {
+    local 'output' (join (toString executions) ' execution(s) in ' (toString (timerMem / 1000)) ' second(s)' (newline) (toString (round (executions / (timerMem / 1000)) 0.01)) ' execution(s) per second')
+    print output
+    return output
+  }
+  executions = (truncate (timeGoal * (executions / (timerMem / 1000))))
+  timerMem = (msecsSinceStart)
+  repeat executions {
+    call function
+  }
+  timerMem = ((msecsSinceStart) - timerMem)
+  local 'output' (join (toString executions) ' execution(s) in ' (toString (timerMem / 1000)) ' second(s)' (newline) (toString (round (executions / (timerMem / 1000)) 0.01)) ' Hz')
+  print output
+  return output
+}
+
 // no-ops
 
 to nop { noop }
