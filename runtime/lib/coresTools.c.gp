@@ -23,10 +23,9 @@ to loadCore coreName {
 to readCoreFile fn {
   // This function makes easy to read files from cores folder
   if (isEmpty (listEmbeddedFiles)) {
-    return (readFile (joinStringArray (array 'runtime/cores/' (getCoreName) '/' fn)))
+    return (readFile (joinStringArray getCoreFolder fn)))
   } else {
-    // There 
-    return (readEmbeddedFile (joinStringArray (array 'cores/' (getCoreName) '/' fn)))
+    return (readEmbeddedFile (joinStringArray getCoreFolder fn)))
   }
 }
 
