@@ -36,6 +36,7 @@ to writeCoreFile fn data {
 to coreLoaderVersion {
   return '0.001'   
 }
+
 // --- Integer.gp ---
 
 method floor Integer { return this }
