@@ -25,17 +25,37 @@ to readCoreFile fn {
   if (isEmpty (listEmbeddedFiles)) {
     return (readFile (joinStringArray (array 'runtime/cores/' (getCoreName) '/' fn)))
   } else {
+    // There 
     return (readEmbeddedFile (joinStringArray (array 'cores/' (getCoreName) '/' fn)))
   }
 }
 
 to writeCoreFile fn data {
-  writeFile (joinStringArray (array 'runtime/cores/' (getCoreName) '/' fn)) data
+  writeFile (joinStringArray getCoreFolder fn)) data
+}
+
+to getCoreFolder {
+  if (isEmpty (listEmbeddedFiles)) {
+    return (joinStringArray (array 'runtime/cores/' (getCoreName) '/'))
+  } else {
+    // There is no runtime folder in an embedded project. The core folder is at 
+	// the root of the embedded project filesystem
+    return (joinStringArray (array 'cores/' (getCoreName) '/'))
+  }
+}
+
+to listCoreFiles {
+  return (listFiles getCoreFolder)
+}
+
+to listCoreDirectories {
+  return (listDirectories (getCoreFolder))
 }
 
 to coreLoaderVersion {
   return '0.001'   
 }
+
 
 // --- Integer.gp ---
 
