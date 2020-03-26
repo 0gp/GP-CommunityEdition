@@ -742,6 +742,7 @@ Line 2')
 	  (array ' ' 'gc'					'collect garbage')
 	  (array 'r' 'mem'					'memory usage')
 	  (array 'r' 'allInstances'			'all instances of _' 'str' 'String')
+	  (array 'r' 'easyBench'            'easyBench _ _' 'auto cmd' 10 nil)
 
 	'Developer'
 	  (array ' ' 'setBlockColors'		'set block colors _ _ _ _' 'color color color color')
