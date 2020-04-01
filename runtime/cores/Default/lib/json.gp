@@ -252,6 +252,10 @@ method stringify JSONWriter obj formatFlag {
   return (joinStrings buf)
 }
 
+
+
+
+
 method writeObject JSONWriter obj {
   if (isAnyClass obj 'Integer' 'Float' 'Boolean') {
 	add buf (toString obj)
