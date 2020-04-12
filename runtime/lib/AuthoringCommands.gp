@@ -297,10 +297,10 @@ to self_delete part {
 }
 
 to castIntoTheVoid obj {
+  // Delete an object from the stage and remove any reference to it
   if (isNil obj) { obj = (implicitReceiver) }
   self_delete obj
   replaceObjects (array obj) (array (nil))
-  gc
 }
 
 to self_instantiate classOrName initData {
