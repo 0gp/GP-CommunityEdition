@@ -278,14 +278,6 @@ method updateClassName Scripter {
   fixClassPaneLayout this
 }
 
-method devModeCategories Scripter {
-  return (array 'Control' 'Motion' 'Looks' 'Drawing' 'Drawing - Paths' 'Color' 'Pixels' 'Sensing' 'Pen' 'Sound' 'Music' 'Operators' 'Variables' 'Words' 'Data' 'Table' 'Structure' 'Network' 'Functions' 'Serial Port' 'File Stream' 'Debugging' 'My Blocks')
-}
-
-method userModeCategories Scripter {
-  return (array 'Control' 'Motion' 'Looks' 'Drawing' 'Color' 'Pixels' 'Sensing' 'Pen' 'Sound' 'Operators' 'Variables' 'Words' 'Data' 'Structure' 'Network' 'My Blocks')
-}
-
 method categories Scripter {
   if (devMode) {
 	result = (devModeCategories this)
