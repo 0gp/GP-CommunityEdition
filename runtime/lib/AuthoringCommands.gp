@@ -296,6 +296,13 @@ to self_delete part {
   stopTasksFor page (handler part)
 }
 
+to castIntoTheVoid obj {
+  if (isNil obj) { obj = (implicitReceiver) }
+  self_delete obj
+  replaceObjects (array obj) (array (nil))
+  gc
+}
+
 to self_instantiate classOrName initData {
   class = nil
   if (isNil classOrName) {
