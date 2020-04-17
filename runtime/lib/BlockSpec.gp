@@ -299,8 +299,8 @@ method countAllSpecSlots BlockSpec {
 method countInputSlots BlockSpec specString {
   // Return the number of underscores (input slots) in the given string.
   result = 0
-  for w (words specString) {
-	if ('_' == w) { result += 1 }
+  for ch (letters specString) {
+	if ('_' == ch) { result += 1 }
   }
   return result
 }
