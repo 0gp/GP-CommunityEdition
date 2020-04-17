@@ -340,6 +340,7 @@ method initialSpecs AuthoringSpecs {
 	  (array ' ' 'animate'				'forever _' 'cmd')
 	  (array ' ' 'if'					'if _ _ : else if _ _ : ...' 'bool cmd bool cmd')
 	  (array ' ' 'repeat'				'repeat _ _' 'num cmd' 10)
+	  (array ' ' 'uninterruptedly'      'uninterruptedly _' 'cmd')
 	  (array ' ' 'waitSecs'				'wait : _ seconds' 'num' 0.1)
 	  (array ' ' 'waitUntil'			'wait until _' 'bool')
 	  (array ' ' 'stopTask'				'stop')
