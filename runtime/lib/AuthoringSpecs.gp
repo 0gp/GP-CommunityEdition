@@ -277,7 +277,12 @@ method needsTranslation AuthoringSpecs spec {
 
   if (isNil translationDictionary) { return false }
   for s (specs spec) {
-	if (contains translationDictionary s) { return true }
+	localization = (localizedOrNil s)
+	if (or (isNil localization) (localization == '--MISSING--')) {
+		return false
+	} else {
+		return true
+	}
   }
   return false
 }
@@ -335,6 +340,7 @@ method initialSpecs AuthoringSpecs {
 	  (array ' ' 'animate'				'forever _' 'cmd')
 	  (array ' ' 'if'					'if _ _ : else if _ _ : ...' 'bool cmd bool cmd')
 	  (array ' ' 'repeat'				'repeat _ _' 'num cmd' 10)
+	  (array ' ' 'uninterruptedly'      'uninterruptedly _' 'cmd')
 	  (array ' ' 'waitSecs'				'wait : _ seconds' 'num' 0.1)
 	  (array ' ' 'waitUntil'			'wait until _' 'bool')
 	  (array ' ' 'stopTask'				'stop')
@@ -556,6 +562,7 @@ Line 2')
 	  (array ' ' 'self_instantiate'		'add an instance of _' 'str.classNameMenu auto' 'MyClass' 0)
 	  (array 'r' 'self_instantiate'		'new instance of _' 'str.classNameMenu auto' 'MyClass' 0)
 	  (array ' ' 'self_delete'			'delete : _' 'obj')
+	  (array ' ' 'castIntoTheVoid'      'remove all references : to _' 'obj')
 	  (array 'r' 'self_owner'			'owner : of _' 'obj')
 	  (array 'r' 'self_stage'			'stage')
 	  (array 'r' 'self_parts'			'parts : of _' 'obj')

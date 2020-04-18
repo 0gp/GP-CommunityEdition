@@ -296,6 +296,13 @@ to self_delete part {
   stopTasksFor page (handler part)
 }
 
+to castIntoTheVoid obj {
+  // Delete an object from the stage and remove any reference to it
+  if (isNil obj) { obj = (implicitReceiver) }
+  self_delete obj
+  replaceObjects (array obj) (array (nil))
+}
+
 to self_instantiate classOrName initData {
   class = nil
   if (isNil classOrName) {
