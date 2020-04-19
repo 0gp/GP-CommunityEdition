@@ -2,8 +2,8 @@
   The purpose of this branch is to make easier the use of custom configuration.
   For the moment configs are .cfg files (zipped files) wich contains two files.
   
-  - 'config.json' : This one is empty for the moment, but the Editor loads it at startup and the parsed json is saved in a global variable. It could contains anything.
-  - 'palette.gp' : This file can be used to change categories of the editor their and colors. 
+  - ```config.json``` : This one is empty for the moment, but the Editor loads it at startup and the parsed json is saved in a global variable. It could contains anything.
+  - ```palette.gp``` : This file can be used to change categories of the editor their and colors. 
   
 # Things to do
   
