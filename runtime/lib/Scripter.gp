@@ -300,7 +300,7 @@ method isUserBlock Scripter spec {
   // Return true if the given block should be shown in the palette  in user mode.
 
   devOnlyBlocks = (array
-	'whenPageResized' 'whenTracking' 'whenScrolled'
+	'whenPageResized' 'whenTracking' 'whenScrolled' 'uninterruptedly'
 	'stageWidth' 'stageHeight'
 	'ln' 'exp' 'toFloat' 'maxInt' 'minInt'
 	'&' '|' '^' '<<' '>>' '>>>'
