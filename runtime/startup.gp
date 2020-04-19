@@ -26,7 +26,9 @@ print
 print
 
 to startup {
-  loadConfigFiles 'defaultdevMode'
+  loadConfigFiles 'default'
   setGlobal 'vectorTrails' false
+  print
+  print
   openProjectEditor true true
 }
