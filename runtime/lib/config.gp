@@ -1,6 +1,7 @@
 // Functions to work with configuration files
 
 to loadConfig cfName {
+  // 
   if (and (isClass cfName 'String') (cfName != 'default') ((lastConfigName) != cfName)) {
 	extractConfig cfName
   } ((lastConfigName) != 'default') {
@@ -12,6 +13,7 @@ to loadConfig cfName {
 }
 
 to extractDefaultConfig {
+  // Extract the files from default .cfg and write them in the 'runtime/config' folder
   print 'Extracting Default Config...'
   clearConfigFiles
   zFile = (read (new 'ZipFile') (readFile 'runtime/default.cfg' true))
@@ -22,6 +24,7 @@ to extractDefaultConfig {
 }
 
 to extractConfig cfName {
+  // Extract the files from an additional .cfg and write them in the 'runtime/config' folder
   print (join 'Extracting config ''' cfName '''...')
   path = (userConfigFolder)
   if (not (contains (listFiles path) (join cfName '.cfg'))) {
@@ -49,18 +52,21 @@ to extractConfig cfName {
 }
 
 to loadConfigFiles {
+  // Load the extracted config files in the 'runtime/config' folder
   setGlobal 'configName' (at (jsonParse (readConfigFile 'info.json')) 'configName')
   setGlobal 'globalConfiguration' (jsonParse (readConfigFile 'config.json'))
   loadPaletteConfig
 }
 
 to clearConfigFiles {
+  // Delete all the files in the 'runtime/config' subfolder
   for f (listFiles 'runtime/config/') {
     deleteFile (join 'runtime/config/' f)
   }
 }
 
 to lastConfigName {
+  // Return the name of the last loaded config or nil if none could be found
   if (not (isClass (readFile 'runtime/config/info.json') 'String' )) { return nil }
   dict = (jsonParse (readFile 'runtime/config/info.json'))
   return (at dict 'configName')
@@ -79,13 +85,15 @@ to userConfigFolder {
 }
 
 to readConfigFile fName binaryFlag {
+  // Return the content of a file inside the config folder
   if (isNil binaryFlag) { binaryFlag = false }
   fileContent = (readFile (join 'runtime/config/' fName) binaryFlag)
   return fileContent
 }
 
 to loadPaletteConfig {
-	loadModuleFromString (topLevelModule) (readConfigFile 'palette.gp' )
+  // Load 'palette.gp' from the config folder 
+  loadModuleFromString (topLevelModule) (readConfigFile 'palette.gp' )
 }
 
 to configAt key {
