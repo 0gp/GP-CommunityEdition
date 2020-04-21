@@ -69,6 +69,28 @@ to gpModFolder {
   return path
 }
 
+to gpFolder {
+  // For compability purposes with projects made with the vanilla editor
+  if ('iOS' == (platform)) { return '.' }
+  path = (userHomePath)
+
+  hidden = (global 'hideFolderShortcuts')
+  if (and (notNil hidden) (contains hidden 'GP')) { return '/' } // if GP hidden, use computer
+
+  // Look for <home>/Documents
+  if (contains (listDirectories path) 'Documents') {
+	path = (join path '/Documents')
+  }
+  if (not (contains (listDirectories path) 'GP')) {
+	// create the GP Mod folder if it does not already exist
+	makeDirectory (join path '/GP')
+  }
+  if (contains (listDirectories path) 'GP') {
+	path = (join path '/GP')
+  }
+  return path
+}
+
 to gpExamplesFolder {
   return (join (absolutePath '.') '/Examples')
 }
