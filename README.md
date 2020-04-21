@@ -3,13 +3,13 @@
   For the moment configs are .cfg files (zipped files) wich contains 3 files.
     
   
-## ```config.json``` :
+### ```config.json``` :
 This one is empty for the moment, but the Editor loads it at startup and the parsed json is saved in a global variable. It could contains anything.
   
-## ```palette.gp``` :
+### ```palette.gp``` :
 This file can be used to change categories of the editor their and colors. 
 
-## ```info.json``` :
+### ```info.json``` :
 Contains info about the config. ```configName``` key should be exactly equal to the name of the .cfg file. ```configVersion``` key has no purpose for the moment.
 
   
