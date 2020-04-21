@@ -26,7 +26,7 @@ print
 print
 
 to startup {
-  loadConfigFiles 'default'
+  loadConfig 'default' // Change the config here
   setGlobal 'vectorTrails' false
   print
   print
