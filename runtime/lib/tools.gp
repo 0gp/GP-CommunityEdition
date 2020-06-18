@@ -11,6 +11,18 @@ to print args... {
   log (joinStringArray (toArray result))
 }
 
+to dbLog msg {
+  // db stands for debug
+  // The purpose of this function is to have a log that can be used when developping functionalities 
+  // then deleted by macros once the functionalities are finished
+  log msg
+}
+
+to dbLogC msg {
+  // Similar to dbLog but this can be used when we want the string to be used as a comment
+  log msg
+}
+
 to inspect obj {
   class = (classOf obj)
   className = (getField class 'className')
