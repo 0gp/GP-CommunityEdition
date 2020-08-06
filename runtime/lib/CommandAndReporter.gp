@@ -6,7 +6,7 @@ method primName Command { return primName }
 method nextBlock Command { return nextBlock }
 method fileName Command { return fileName }
 method lineno Command { return lineno }
-method toString Command { return (join '<Commmand ' primName '>') }
+method toString Command { return (join '<Command ' primName '>') }
 
 method eval Command obj module {
   func = (functionFor obj this)
@@ -16,7 +16,7 @@ method eval Command obj module {
 
 to newCommand op {
   comment '
-	Create a commmand for the given operation. Any additional arguments
+	Create a command for the given operation. Any additional arguments
 	are used as the arguments of the new command.'
 
   fixedFields = (fieldNameCount (class 'Command'))
