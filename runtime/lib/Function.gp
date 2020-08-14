@@ -317,6 +317,20 @@ method removeFieldsFromLocals Function fieldNames {
   localNames = (toArray newLocals)
 }
 
+method combineWith Function f {
+  // UNFINISHED
+  // This is not fully tested, I'm writing this without a full knowledge 
+  // of the meaning of all fields (module & classIndex in particular) ~Spiralo-Idioïde
+  argNames = (toArray (union argNames (argNames f)))
+  localNames = (toArray (union localNames (localNames f)))
+  cmd = cmdList
+  while (notNil (nextBlock cmd)) {
+    cmd = (nextBlock cmd)
+  }
+  setNextBlock cmd (cmdList f)
+  
+}
+
 // finding functions
 
 to functions { return (globalFuncs) }

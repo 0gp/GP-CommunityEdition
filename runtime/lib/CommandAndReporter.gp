@@ -87,6 +87,10 @@ method allBlocks Command result {
   return result
 }
 
+method setNextBlock Command cmd {
+  nextBlock = cmd
+}
+
 to allBlocks Nil result {
   if (isNil result) { result = (list) }
   return result
