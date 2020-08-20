@@ -66,10 +66,10 @@ method initializeForConfirm Prompter+ label question yesLabel noLabel anAction {
   setMinExtent morph (width morph) (height morph)
 }
 
-to prompt+ForNumber title anAction minValue maxValue currentValue {
+to prompt+ForNumber title anAction minValue maxValue currentValue question {
   page = (global 'page')
   p = (new 'Prompter+')
-  initializeForSlider p title anAction minValue maxValue currentValue
+  initializeForSlider p title anAction minValue maxValue currentValue question
   setCenter (morph p) (x (hand page)) (y (hand page))
   keepWithin (morph p) (insetBy (bounds (morph page)) 50)
   addPart (morph page) (morph p)
@@ -108,7 +108,7 @@ to prompt+ForConfirm label question yesLabel noLabel anAction {
   return (answer p)
 }
 
-method initializeForSlider Prompter+ title anAction minValue maxValue currentValue {
+method initializeForSlider Prompter+ title anAction minValue maxValue currentValue question {
   if (isNil title) {title = 'Number?'}
   if (isNil minValue) { minValue = 0 }
   if (isNil maxValue) { maxValue = 100 }
@@ -123,17 +123,26 @@ method initializeForSlider Prompter+ title anAction minValue maxValue currentVal
   border = (border window)
   morph = (morph window)
   setHandler morph this
+  
+  qFrameHeight = 0
+  lbl = (getField window 'label')
+  questionFrame = (newText (localized question) (fontName lbl) (fontSize lbl) (gray 0) 'center')
+  if (notNil question) {
+    addPart morph (morph questionFrame)
+    qFrameHeight = (height (morph questionFrame))
+  }
 
   scale = (global 'scale')
   slider = (slider 'horizontal' (150 * scale) callback (10 * scale) minValue maxValue currentValue)
-  currentValueFrame = (newText currentValue 'Arial Bold' (12 * scale) (gray 0) 'center')
-  w = ((width (morph slider)) + (20 * scale))
-  setPosition (morph slider) (20 * scale) (35 * scale)
-  setPosition (morph currentValueFrame) (w / 2) (50 * scale)
+  currentValueFrame = (newText currentValue 'Arial' (11 * scale) (gray 0) 'center')
+  w = ( (max (width (morph slider)) (width (morph questionFrame)) ) + (20 * scale))
+  setPosition (morph questionFrame) (w / 2) 30 // Might not be the best solution
+  setPosition (morph slider) (20 * scale) (+ (40 * scale) qFrameHeight)
+  setPosition (morph currentValueFrame) (w / 2) (+ (50 * scale) qFrameHeight)
   addPart morph (morph slider)
   addPart morph (morph currentValueFrame)
   createButtons this 'ok' 'cancel'
-  setExtent morph (w + (4 * border)) (+ (height (morph slider)) (height (bounds buttons)) (height (morph currentValueFrame)) (60 * scale))
+  setExtent morph (w + (4 * border)) (+ (height (morph slider)) (height (bounds buttons)) (height (morph currentValueFrame)) qFrameHeight (60 * scale))
   setMinExtent morph (width morph) (height morph)
 }
 
@@ -177,6 +186,7 @@ method fixLayout Prompter+ {
   buttonHeight = (height (bounds buttons))
 
   if (notNil slider) { // Slider dialog
+    setXCenter (morph questionFrame) (hCenter clientArea) // Might not be the best solution
 	setXCenter (morph slider) (hCenter clientArea)
 	setXCenter (morph currentValueFrame) (hCenter clientArea)
   } (isNil textBox) { // confirmation dialog
