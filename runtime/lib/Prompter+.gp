@@ -1,6 +1,9 @@
 // Prompter+.gp - request text or yes/no input from the user
 
-defineClass Prompter+ morph window textBox textFrame buttons slider answer isDone callback sliderValue
+// UNFINISHED
+// The field currentValueFrame mignt need to be renamed
+
+defineClass Prompter+ morph window textBox textFrame buttons slider answer isDone callback sliderValue currentValueFrame
 
 method textBox Prompter+ {return textBox}
 method answer Prompter+ {return answer}
@@ -71,7 +74,10 @@ to prompt+ForNumber title anAction minValue maxValue currentValue {
   keepWithin (morph p) (insetBy (bounds (morph page)) 50)
   addPart (morph page) (morph p)
   setField (hand page) 'lastTouchTime' nil
-  while (not (isDone p)) { doOneCycle page }
+  while (not (isDone p)) { 
+  doOneCycle page 
+  redraw p
+  } // Loop until the prompter is either validated or closed
   destroy (morph p)
   return (answer p)
 }
@@ -94,12 +100,14 @@ method initializeForSlider Prompter+ title anAction minValue maxValue currentVal
 
   scale = (global 'scale')
   slider = (slider 'horizontal' (150 * scale) callback (10 * scale) minValue maxValue currentValue)
-  setPosition (morph slider) (20 * scale) (35 * scale)
-  addPart morph (morph slider)
-  createButtons this 'ok' 'cancel'
-
+  currentValueFrame = (newText currentValue 'Arial Bold' (12 * scale) (gray 0) 'center')
   w = ((width (morph slider)) + (20 * scale))
-  setExtent morph (+ w (4 * border)) (+ (height (morph slider)) (height (bounds buttons)) (60 * scale))
+  setPosition (morph slider) (20 * scale) (35 * scale)
+  setPosition (morph currentValueFrame) (w / 2) (50 * scale)
+  addPart morph (morph slider)
+  addPart morph (morph currentValueFrame)
+  createButtons this 'ok' 'cancel'
+  setExtent morph (w + (4 * border)) (+ (height (morph slider)) (height (bounds buttons)) (height (morph currentValueFrame)) (60 * scale))
   setMinExtent morph (width morph) (height morph)
 }
 
@@ -117,6 +125,7 @@ method createButtons Prompter+ okLabel cancelLabel {
 }
 
 method redraw Prompter+ {
+  if (notNil slider) { setText (my 'currentValueFrame') (value (my 'slider')) } 
   redraw window
   redrawShadow window
   drawInside this
@@ -143,6 +152,7 @@ method fixLayout Prompter+ {
 
   if (notNil slider) {
 	setXCenter (morph slider) (hCenter clientArea)
+	setXCenter (morph currentValueFrame) (hCenter clientArea)
   } (isNil textBox) { // confirmation dialog
     setTop (morph textFrame) ((top clientArea) + (2 * border))
     setXCenter (morph textFrame) (hCenter clientArea)
