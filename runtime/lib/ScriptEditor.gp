@@ -274,7 +274,7 @@ method contextMenu ScriptEditor {
   addLine menu
   addItem menu 'save picture of all scripts' 'saveScriptsImage'
   addItem menu 'copy all scripts to clipboard' 'copyScriptsToClipboard'
-  clip = (getClipboard)
+  clip = (readClipboard)
   if (beginsWith clip 'GP Scripts') {
 	addItem menu 'paste scripts' 'pasteScripts'
   } (beginsWith clip 'GP Script') {
@@ -468,16 +468,23 @@ method scriptChanged ScriptEditor {
 // saving script image
 
 method saveScriptsImage ScriptEditor {
-  fName = (uniqueNameNotIn (listFiles (gpModFolder)) 'scriptsImage' '.png')
-  fName = (fileToWrite fName '.png')
-  if ('' == fName) { return }
-  if (not (endsWith fName '.png')) { fName = (join fName '.png') }
+  if ('Browser' != (platform)) {
+	fName = (uniqueNameNotIn (listFiles (gpFolder)) 'allScripts' '.png')
+	fName = (fileToWrite fName '.png')
+	if ('' == fName) { return }
+	if (not (endsWith fName '.png')) { fName = (join fName '.png') }
+  }
   gc
   bnds = (bounds morph)
   bm = (newBitmap (width bnds) (height bnds))
   draw2 morph bm (- (left bnds)) (- (top bnds))
   pixelsPerInch = (72 * (global 'scale'))
-  writeFile fName (encodePNG bm pixelsPerInch)
+  pngData = (encodePNG bm pixelsPerInch)
+  if ('Browser' == (platform)) {
+	browserWriteFile pngData 'allScripts' 'png'
+  } else {
+	writeFile fName pngData
+  }
 }
 
 // script copy/paste via clipboard
@@ -494,7 +501,7 @@ method pasteScripts ScriptEditor {
   scripter = (ownerThatIsA morph 'Scripter')
   if (isNil scripter) { scripter = (ownerThatIsA morph 'GPModScripter') }
   if (isNil scripter) { return }
-  s = (getClipboard)
+  s = (readClipboard)
   i = (find (letters s) (newline))
   s = (substring s i)
   pasteScripts (handler scripter) s

@@ -330,7 +330,6 @@ method combineWith Function f {
   setNextBlock cmd (cmdList f)
   
 }
-
 // finding functions
 
 to functions { return (globalFuncs) }

@@ -15,6 +15,11 @@ to block type color opName {
   for i ((argCount) - 2) {add (at labelParts 1) (arg (i + 2))}
   lc = (color 255 255 255)
   fn = 'Verdana Bold'
+  fontSize = (11 * scale)
+  if (or ('Linux' == (platform)) ('Browser' == (platform))) {
+	fn = 'Arial Bold'
+	fontSize = (15 * scale)
+  }
   if (global 'stealthBlocks') {
     lc = (gray (stealthLevel 255 0))
     if ((red lc) < 200) {
@@ -22,7 +27,7 @@ to block type color opName {
     }
   }
   if ((count (at labelParts 1)) == 0)  {
-    labelParts = (list (list (newText opName fn (scale * 11) lc nil (darker color) (off * -1) (off * -1))))
+    labelParts = (list (list (newText opName fn fontSize lc nil (darker color) (off * -1) (off * -1))))
     op = opName
   } else {
     op = (arg 3)
@@ -31,7 +36,7 @@ to block type color opName {
   for i (count group) {
     part = (at group i)
     if (isClass part 'String') {
-      atPut group i (newText part fn (scale * 11) lc nil (darker color) (off * -1) (off * -1))
+      atPut group i (newText part fn fontSize lc nil (darker color) (off * -1) (off * -1))
     } (isClass part 'Command') {
       inp = (newCommandSlot color)
       atPut group i inp
@@ -886,17 +891,24 @@ method copyToClipboard Block {
 }
 
 method exportAsImage Block {
-  fName = (uniqueNameNotIn (listFiles (gpModFolder)) 'scriptImage' '.png')
-  fName = (fileToWrite fName '.png')
-  if ('' == fName) { return }
-  if (not (endsWith fName '.png')) { fName = (join fName '.png') }
+  if ('Browser' != (platform)) {
+	fName = (uniqueNameNotIn (listFiles (gpFolder)) 'scriptImage' '.png')
+	fName = (fileToWrite fName '.png')
+	if ('' == fName) { return }
+	if (not (endsWith fName '.png')) { fName = (join fName '.png') }
+  }
   gc
-  pixelsPerInch = 288
+  pixelsPerInch = 144
   scaledScript = (scaledScript this (pixelsPerInch / 72))
   bnds = (fullBounds (morph scaledScript))
   bm = (newBitmap (width bnds) (height bnds))
   draw2 (morph scaledScript) bm (- (left bnds)) (- (top bnds))
-  writeFile fName (encodePNG bm 288)
+  pngData = (encodePNG bm pixelsPerInch)
+  if ('Browser' == (platform)) {
+	browserWriteFile pngData 'scriptImage' 'png'
+  } else {
+	writeFile fName pngData
+  }
 }
 
 method scaledScript Block scriptScale {
@@ -993,7 +1005,7 @@ method openClassBrowser Block className {
   if (notNil editor) {
 	cl = (classNamed (module (project (handler editor))) className)
   }
-  if (isNil cl) { cl =  className }
+  if (isNil cl) { cl = (class className) }
   browseClass cl (primName expression)
 }
 
@@ -1189,8 +1201,19 @@ to toBlock commandOrReporter silently {
 method labelText Block aString {
   fontName =  'Verdana Bold'
   fontSize = (11 * scale)
-  if (isOneOf aString '+' '-' '*' '/' '×' '−') {  // the last two are unicode multiple and minus
-  	fontSize = (12 * scale)
+  if (isOneOf aString '/' '=' '+' '×' '−') { // last two: unicode multiply and minus
+  	fontSize = (15 * scale)
+  }
+  if (isOneOf aString '≠') { // unicode not equal
+  	fontSize = (16 * scale)
+  }
+  if ('Linux' == (platform)) {
+	fontName =  'Sans Bold'
+	fontSize = (round (0.85 * fontSize))
+  }
+  if ('Browser' == (platform)) {
+	fontName = 'Arial Bold'
+	fontSize = (fontSize + (2 * scale))
   }
   if (global 'stealthBlocks') {
     labelColor = (gray (stealthLevel 255 0))
@@ -1431,6 +1454,11 @@ method initializeForSpec Block spec suppressExpansion silently {
   }
   labelParts = (list group)
   addAllLabelParts this silently
+
+  // hack: make the font bigger in comment blocks
+  if ('comment' == (blockOp spec)) {
+	setFont (getField (last (first labelParts)) 'text') nil (13 * scale)
+  }
 
   // expand to the first input slot, if any
   if suppressExpansion {return}

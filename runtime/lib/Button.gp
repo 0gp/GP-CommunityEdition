@@ -33,7 +33,7 @@ method setOn Button bool {
 }
 
 method setLabel Button label offColor onColor minWidth minHeight fontName fontSize fontColor {
-  if (isNil offColor) { offColor = (gray 150) }
+  if (isNil offColor) { offColor = (gray 140) }
   if (isNil onColor) { onColor = (lighter offColor 15) }
   offBM = (makeCostume this label offColor minWidth minHeight fontName fontSize fontColor)
   onBM = (makeCostume this label onColor minWidth minHeight fontName fontSize fontColor)
@@ -52,11 +52,12 @@ method makeCostume Button label color minWidth minHeight fontName fontSize fontC
   // Draw a button with the given label and color. The label can be a String or a Bitmap.
   scale = (global 'scale')
   if (isNil label) { label = 'Click!' }
-  if (isNil color) { color = (gray 120) }
+  if (isNil color) { color = (gray 130) }
   if (isNil minWidth) { minWidth = 10 }
   if (isNil minHeight) { minHeight = 10 }
   if (isNil fontName) { fontName = 'Arial Bold' }
   if (isNil fontSize) { fontSize = (scale * 13) }
+  if ('Linux' == (platform)) { fontSize = (scale * 11) }
   if (isNil fontColor) { fontColor = (gray 255) }
 
   borderColor = (gray 80)
@@ -67,7 +68,7 @@ method makeCostume Button label color minWidth minHeight fontName fontSize fontC
 
   if (isClass label 'String') {
 	setFont fontName fontSize
-	labelBitmap = (newBitmap (stringWidth label) (fontHeight))
+	labelBitmap = (newBitmap (stringWidth label) (fontHeight) (gray 255 0))
 	drawString labelBitmap label fontColor
   } else {
 	labelBitmap = label

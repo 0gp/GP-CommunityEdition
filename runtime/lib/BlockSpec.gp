@@ -62,7 +62,7 @@ to blockSpecFromStrings blockOp blockType specString typeString defaults {
     atPut specs i (trim (at specs i))
   }
   repeatLastSpec = false
-  if ('...' == (last specs)) {
+  if (and ((count specs) > 0) ('...' == (last specs))) {
 	repeatLastSpec = true
     specs = (copyArray specs ((count specs) - 1))
   }
@@ -202,9 +202,9 @@ method slotInfoForIndex BlockSpec slotIndex {
   if (not repeatLastSpec) { error 'Slot index is out of range' }
   repeatedSlotCount = (countInputSlots this (last specs))
   if (repeatedSlotCount == 0) { error 'The repeated slot spec must have at least one input slot' }
-  repeatedSlotStart = (((count slotInfo) - repeatedSlotCount))
-  n = (slotIndex - repeatedSlotStart)
-  i = (max 1 ((((n - repeatedSlotStart) % repeatedSlotCount)) + repeatedSlotStart))
+  firstRepeatedSlot = ((((count slotInfo) - repeatedSlotCount)) + 1)
+  i = (firstRepeatedSlot + ((slotIndex - firstRepeatedSlot) % repeatedSlotCount))
+  if (i < 1) { return (array 'auto' '' nil nil) } // default if no slot info
   return (at slotInfo i)
 }
 
@@ -299,8 +299,8 @@ method countAllSpecSlots BlockSpec {
 method countInputSlots BlockSpec specString {
   // Return the number of underscores (input slots) in the given string.
   result = 0
-  for ch (letters specString) {
-	if ('_' == ch) { result += 1 }
+  for w (words specString) {
+	if ('_' == w) { result += 1 }
   }
   return result
 }

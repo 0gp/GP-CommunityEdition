@@ -245,7 +245,10 @@ method selectClassAndInstance ProjectEditor aTargetClass {
 
 method saveProject ProjectEditor fName {
   if (and (isNil fName) (notNil fileName)) {
-	fName = (join (gpModFolder) '/' (filePart fileName))
+	fName = fileName
+	if (beginsWith fName (gpExamplesFolder)) {
+	  fName = (join (gpModFolder) '/' (filePart fileName))
+	}
   }
 
   if (isNil fName) {
@@ -479,7 +482,7 @@ method checkForBrowserResize ProjectEditor {
 
 method importMediaFile ProjectEditor type {
   if ('Browser' == (platform)) {
-	browserFileImport
+	browserReadFile
   } else {
 	if ('image' == type) {
 	  if (isNil imagesFolder) { imagesFolder = (gpModFolder) }

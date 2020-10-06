@@ -43,6 +43,7 @@ to rightClicked aHandler {
 to touchHold aHandler {return false}
 to swipe aHandler scrollX scrollY { return (dispatchEvent aHandler 'whenScrolled' scrollX scrollY) }
 to pageResized aHandler { dispatchEvent aHandler 'whenPageResized' }
+to scaleChanged aHandler { noop }
 to changed aHandler { noop }
 to okayToBeDestroyedByUser aHandler {return true}
 to destroyedMorph aHandler { noop }
@@ -84,7 +85,7 @@ to postSerialize aHandler {}
 
 // Hand
 
-defineClass Hand morph page isDown x y currentMorphs lastTouched lastClicked lastClickTime lastTouchTime oldOwner oldX oldY focus
+defineClass Hand morph page isDown x y currentMorphs lastTouched lastClicked lastClickTime lastTouchTime oldOwner oldX oldY focus morphicMenuDisabled
 
 to newHand {
   hand = (new 'Hand' nil nil false 0 0 (list) nil nil (newTimer) nil nil nil)
@@ -430,7 +431,11 @@ method stopEditingUnfocusedText Hand currentObj {
 
 // menus
 
+method toggleMorphicMenu Hand flag { morphicMenuDisabled = (not flag) }
+
 method devMenu Hand currentObj {
+  if morphicMenuDisabled { return }
+
   if (isNil currentObj) {currentObj = (currentObject this)}
   se = (ownerThatIsA (morph currentObj) 'ScriptEditor')
   if (notNil se) {
@@ -790,7 +795,7 @@ method doOneCycle Page {
   step soundMixer
   // sleep for any extra time, but always sleep a little to ensure that
   // we get events (and to return control to the browser)
-  sleepTime = (max 1 (10 - (msecs t)))
+  sleepTime = (max 1 (15 - (msecs t)))
   waitMSecs sleepTime
 }
 
@@ -826,10 +831,34 @@ to getNextEvent {
   return evt
 }
 
+to readClipboard {
+  // Return the contents of the clipboard.
+
+  if ('Browser' == (platform)) {
+	// On browsers, read the clipboard twice, with a short wait in between.
+	getClipboard
+	waitMSecs 1
+  }
+  return (getClipboard)
+}
+
+method updateScale Page {
+  winSize = (windowSize)
+  ratio = ((at winSize 3) / (at winSize 1))
+  if (2 == ratio) {
+	setGlobal 'scale' 2 // retina display
+  } else {
+	setGlobal 'scale' 1 // non-retina display
+  }
+}
+
 method processWindowEvent Page evt {
-  scale = (global 'scale')
   id = (at evt 'eventID')
-  if (isOneOf id 5 6) {
+  if (6 == id) {
+	oldScale = (global 'scale')
+	updateScale this
+	scale = (global 'scale')
+
 	// note: things can break if w or h is less than 1
 	w = (scale * (max 1 (at evt 'data1')))
 	h = (scale * (max 1 (at evt 'data2')))
@@ -839,8 +868,11 @@ method processWindowEvent Page evt {
 	setPosition morph 0 0
 	setExtent morph w h
 	isChanged = true
-	for each (parts morph) {pageResized (handler each) w h this}
-  } else {
+	for each (parts morph) { pageResized (handler each) w h this }
+	if (scale != oldScale) {
+	  for m (allMorphs morph) { scaleChanged (handler m) }
+	}
+  } (isOneOf id 1 3 8 9) {
 	isChanged = true
 	for each (parts morph) {pageResized (handler each) w h this}
   }
@@ -977,14 +1009,8 @@ method showMenu Page aMenu x y {
   activeMenu = aMenu
 }
 
-to inform msg { inform (global 'page') msg }
-
-method inform Page msg {
-  m = (menu msg)
-  addItem m (localized 'Ok') 'nop'
-  buildMorph m this (y hand)
-  setGrabRule (morph m) 'handle'
-  showMenu this m ((x hand) - (half (width (morph m)))) ((y hand) - (half (height (morph m))))
+to inform details title yesLabel {
+	return (inform (global 'page') details title yesLabel)
 }
 
 method closeUnclickedMenu Page aHandler {
@@ -1016,7 +1042,7 @@ method removeHint Page {
 
 // prompting and confirming
 
-method prompt Page question default editRule callback {
+method prompt Page question default editRule callback details {
   // prompt can be used either as a reporter or as a command
   // if a callback is passed prompt is used as a command, when
   // the user accepts the prompter, the callback is called with
@@ -1032,7 +1058,7 @@ method prompt Page question default editRule callback {
   // to use in scripts
   if (isNil editRule) { editRule = 'line' }
   p = (new 'Prompter')
-  initialize p (localized question) (localized default) editRule callback
+  initialize p (localized question) (localized default) editRule callback details
   fixLayout p
   setPosition (morph p) (half ((width morph) - (width (morph p)))) (40 * (global 'scale'))
   addPart morph (morph p)
@@ -1058,6 +1084,17 @@ method confirm Page title question yesLabel noLabel callback {
     destroy (morph p)
     return (answer p)
   }
+}
+
+method inform Page details title yesLabel {
+  p = (new 'Prompter')
+  initializeForInform p title details yesLabel
+  setPosition (morph p) (half ((width morph) - (width (morph p)))) (40 * (global 'scale'))
+  addPart morph (morph p)
+  setField hand 'lastTouchTime' nil
+  while (not (isDone p)) {doOneCycle this}
+  destroy (morph p)
+  return (answer p)
 }
 
 // events
@@ -1089,7 +1126,7 @@ method rightClicked Page {
 
 method contextMenu Page {
   menu = (menu 'GP' this)
-  addItem menu 'GP Mod version...' 'showGPVersion'
+  addItem menu 'GP version...' 'showGPVersion'
   addLine menu
   addItem menu 'show all' 'showAll' 'move any offscreen objects back into view'
   if (devMode) {

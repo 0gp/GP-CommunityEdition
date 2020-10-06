@@ -484,6 +484,10 @@ method saveSoundAs Project snd name {
 
 // extensions
 
+method recordBlockSpec Project opName spec {
+	atPut blockSpecs opName spec
+}
+
 method specsForCategory Project cat {
   result = (list)
   for op (at paletteBlocks cat (array)) {
@@ -685,13 +689,13 @@ method removeClassFromPages Project aClass {
 
 method makeShip Project {
   data = 'iVBORw0KGgoAAAANSUhEUgAAACgAAAAeCAYAAABe3VzdAAABmElEQVR4nGNgZ2f/D8V/1dTUDoiLiycw
-  MDDwMAwWwMnJ+RvJkWAsICDwGejYBTw8PA5AJYwD6kBlZeUOkKO4ZLn+S1aL/eez4P3PzoFwrJSU1COg
-  mnYWFhblgXIjm6Ki4mWQY0Rihf4r75P7r7BS5r9YhvB/bgUulJBVUVE5LSEhkcpA7yQAjGYzcFRzsv+X
-  nSIJdiQY75X7LztZ8r9QgMB/TgFOuEP5+Pi+qaurrwQmBR+gdia6OBIW1dwq3P+VtssiHAnFIDHJxoFN
-  AhhRjQsPWBLAGdW48EAkAVB04YtqXJieSQAR1TH4o3rAkgDJUT0QSYDcqKZnEqA4qmmeBGBRzcHJ8V92
-  uhRVHQlLAjITJP4LevH/5+TnwNUWIBjV4AKcRxUY1Tsoj2pcWHGLzH/JSmASMOZBSQJD24GDPYqJrvoG
-  JJOgNB6oELVULWYGe0FNcdTStKojN2rp0lgY7M2twd1gBUZDJ76oHdAm/2DvNA3ubie84y7N+V+iWBSj
-  LpSRkbkP9EADMAqV6OYoZDDohz4G++ARAFGPsWx+VWYhAAAAAElFTkSuQmCC'
+MDDwMAwWwMnJ+RvJkWAsICDwGejYBTw8PA5AJYwD6kBlZeUOkKO4ZLn+S1aL/eez4P3PzoFwrJSU1COg
+mnYWFhblgXIjm6Ki4mWQY0Rihf4r75P7r7BS5r9YhvB/bgUulJBVUVE5LSEhkcpA7yQAjGYzcFRzsv+X
+nSIJdiQY75X7LztZ8r9QgMB/TgFOuEP5+Pi+qaurrwQmBR+gdia6OBIW1dwq3P+VtssiHAnFIDHJxoFN
+AhhRjQsPWBLAGdW48EAkAVB04YtqXJieSQAR1TH4o3rAkgDJUT0QSYDcqKZnEqA4qmmeBGBRzcHJ8V92
+uhRVHQlLAjITJP4LevH/5+TnwNUWIBjV4AKcRxUY1Tsoj2pcWHGLzH/JSmASMOZBSQJD24GDPYqJrvoG
+JJOgNB6oELVULWYGe0FNcdTStKojN2rp0lgY7M2twd1gBUZDJ76oHdAm/2DvNA3ubie84y7N+V+iWBSj
+LpSRkbkP9EADMAqV6OYoZDDohz4G++ARAFGPsWx+VWYhAAAAAElFTkSuQmCC'
   bm = (readFrom (new 'PNGReader') (base64Decode data))
   setName bm 'ship'
   return bm

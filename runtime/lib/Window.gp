@@ -95,6 +95,10 @@ method spaceBoundedBy Window max percent total {
   return (min ceil ((percent * total) / 100))
 }
 
+method titleBarWidth Window {
+  return (+ (width (morph label)) (width (morph closeBtn)) (4 * border))
+}
+
 // serialization
 
 method preSerialize Window {
